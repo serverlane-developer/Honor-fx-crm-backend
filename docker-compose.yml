@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+  db:
+    image: postgres
+    container_name: db
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - db_app:/var/lib/postgresql/data
+    environment:
+      TZ: "Asia/Calcutta"
+      POSTGRES_DB: honor_fx_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: fostgres
+volumes:
+  db_app:
