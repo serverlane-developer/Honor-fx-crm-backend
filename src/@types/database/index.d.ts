@@ -5,4 +5,7 @@ import Submodule from "./Submodule";
 import Role from "./Role";
 import AccessControl from "./AccessControl";
 
-export { AdminUser, AdminLoginLog, Module, Submodule, Role, AccessControl };
+import Customer from "./Customer";
+import CustomerLoginLog from "./CustomerLoginLog";
+
+export { AdminUser, AdminLoginLog, Module, Submodule, Role, AccessControl, Customer, CustomerLoginLog };
