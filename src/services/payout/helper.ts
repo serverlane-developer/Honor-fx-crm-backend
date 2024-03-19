@@ -1,4 +1,5 @@
-import { PgTransaction, Withdraw } from "../../@types/database";
+import * as libphonenumber from "libphonenumber-js";
+import { Customer, PgTransaction, Withdraw } from "../../@types/database";
 import { requestId } from "../../@types/Common";
 import {
   CashFree,
@@ -14,13 +15,13 @@ import {
   FinixPay,
 } from "../../@types/Payout";
 
-import { Status, payment_req_method, transaction_status } from "../../@types/database/Withdraw";
+import { Status, transaction_status } from "../../@types/database/Withdraw";
 
-import helper from "../../helpers/helpers";
 import logger from "../../utils/logger";
 
 import * as withdrawRepo from "../../db_services/withdraw_repo";
 import * as pgTransactionRepo from "../../db_services/pg_transaction_repo";
+import CustomerPaymentMethod, { payment_method } from "../../@types/database/CustomerPaymentMethod";
 // import { getSourceTransaction } from "../../helpers/withdrawEncryption";
 
 const parsePgOrderIdForIserverU = (id = "") => id.replace(/-/g, "").slice(0, 14); // IServeU
@@ -28,21 +29,19 @@ const parsePgOrderIdForIserverU = (id = "") => id.replace(/-/g, "").slice(0, 14)
 const createPaymentData = (
   pg_order_id: string,
   transaction: Partial<Withdraw>,
-  mode: payment_req_method,
+  customer: Customer,
+  customer_payment_method: CustomerPaymentMethod,
+  mode: payment_method,
   requestId: requestId
 ) => {
   const { amount: amt, transaction_id } = transaction as Withdraw;
   const amount = Number(amt);
-  const phone = helper.getRandomMobileNumber();
-  const email = "abc@test.com";
+  const phone = libphonenumber.parsePhoneNumber(customer.phone_number).number;
+  const email = customer.email || `${customer.username}@test.com`;
   const remarks = "PG transfer";
 
-  // TODO: WHERE TO GET ACCOUNT DETAILS FROM
-  throw "error";
-  const account_name = "",
-    account_number = "",
-    ifsc = "";
-  // const ifsc = transaction_ifsc.toUpperCase();
+  const { account_name, account_number, ifsc: transaction_ifsc, bank_name } = customer_payment_method;
+  const ifsc = transaction_ifsc.toUpperCase();
 
   logger.debug("Creating Payment Data for Payout", { requestId, pg_order_id, transaction });
   // if (PAYMENT_GATEWAY === "CASHFREE") {
@@ -78,7 +77,7 @@ const createPaymentData = (
   // if (PAYMENT_GATEWAY === "QIKPAY") {
   const qikPayObj: QikPay.PayoutRequest = {
     AccountNumber: account_number,
-    Bank: "Bank",
+    Bank: bank_name,
     BeneficiaryName: account_name,
     IFSCCode: ifsc,
     MobileNumber: phone,
@@ -92,7 +91,7 @@ const createPaymentData = (
   const iserveuObj: Iserveu.PayoutRequest = {
     amount,
     beneAccountNo: account_number,
-    beneBankName: "Bank",
+    beneBankName: bank_name,
     beneifsc: ifsc,
     beneName: account_name,
     benePhoneNo: phone,
@@ -151,7 +150,7 @@ const createPaymentData = (
     email,
     phone,
     amount,
-    note: "Payment Transfer",
+    note: remarks,
     account_name,
     account_number,
     ifsc,
@@ -627,9 +626,9 @@ const updatePaymentStatus = async (
       updatedTxn = await withdrawRepo.updateTransaction(
         { transaction_id },
         {
-          status: isProcessing ? txnStatus : Status.PENDING,
+          status: isProcessing ? (paymentStatus === "PENDING" ? Status.PROCESSING : Status.SUCCESS) : Status.PENDING,
           payment_status: paymentStatus,
-          message: paymentObj.message,
+          payout_message: paymentObj.message,
           api_error: paymentObj.api_error,
           utr_id: transactionExists.utr_id || paymentObj.utr_id,
           payment_order_id: paymentObj.payment_order_id,
@@ -641,6 +640,7 @@ const updatePaymentStatus = async (
             payment_status: null,
             payment_order_id: null,
             utr_id: null,
+            pg_task: false,
           }),
         }
       );

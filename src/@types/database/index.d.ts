@@ -10,6 +10,7 @@ import CustomerLoginLog from "./CustomerLoginLog";
 import PaymentGateway from "./PaymentGateway";
 import Withdraw from "./Withdraw";
 import PgTransaction from "./PgTransaction";
+import CustomerPaymentMethod from "./CustomerPaymentMethod";
 
 export {
   AdminUser,
@@ -23,4 +24,5 @@ export {
   PaymentGateway,
   Withdraw,
   PgTransaction,
+  CustomerPaymentMethod
 };

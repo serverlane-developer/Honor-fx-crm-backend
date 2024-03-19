@@ -7,7 +7,7 @@ import { PaymentGateway } from "../@types/database";
 import { knex, knexRead } from "../data/knex";
 
 import { PaginationParams } from "../@types/Common";
-import { PaymentMethod, payment_req_method } from "../@types/database/Withdraw";
+import { PaymentMethod, payment_method } from "../@types/database/CustomerPaymentMethod";
 
 const tablename = "payment_gateway";
 
@@ -108,7 +108,7 @@ export const getAllGateways = async ({
   return query;
 };
 
-export const getPaymentMethod = (pg: PaymentGateway, amount: number): payment_req_method | null => {
+export const getPaymentMethod = (pg: PaymentGateway, amount: number): payment_method | null => {
   const { imps_enabled, imps_max, imps_min, neft_enabled, neft_max, neft_min } = pg;
   if (amount >= Number(imps_min || 0) && amount <= Number(imps_max || 0) && imps_enabled) {
     return PaymentMethod.IMPS;
