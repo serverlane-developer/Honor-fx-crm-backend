@@ -44,18 +44,38 @@ const envVarsSchema = joi
 
     AWS_REGION: validators.awsRegion.optional().allow(""),
     SES_FROM_EMAIL: validators.email.optional().allow(""),
-    // BUCKET_NAME: joi.string().required(),
+    BUCKET_NAME: joi.string().optional(),
 
     ENCRYPTION_KEY: joi.string().required(),
     ENCRYPTION_IV: joi.string().required(),
 
     TIMEZONE: joi.string().default("Asia/Kolkata").optional(),
+
+    SEND_CUSTOMER_OTP: joi.string().valid("true", "false").required(),
+    SMS_BASE_URL: joi.string().uri().optional(),
+    SMS_AUTH_KEY: joi.string().optional(),
+    SMS_DLT_TE_ID: joi.string().optional(),
+    SMS_SENDER: joi.string().optional(),
+    SMS_ROUTE: joi.string().optional(),
+    SMS_MESSAGE: joi.string().optional(),
+    SMS_KEYWORD: joi.string().optional(),
   })
   .unknown()
   .when(joi.object({ NODE_ENV: "production" }).unknown(), {
     then: joi.object().append({
       SEND_ADMIN_OTP: joi.string().valid("true").required(),
       SES_FROM_EMAIL: validators.email.required(),
+    }),
+  })
+  .when(joi.object({ SEND_CUSTOMER_OTP: "true" }).unknown(), {
+    then: joi.object().append({
+      SMS_BASE_URL: joi.string().uri().required(),
+      SMS_AUTH_KEY: joi.string().required(),
+      SMS_DLT_TE_ID: joi.string().required(),
+      SMS_SENDER: joi.string().required(),
+      SMS_ROUTE: joi.string().required(),
+      SMS_MESSAGE: joi.string().required(),
+      SMS_KEYWORD: joi.string().required(),
     }),
   });
 
@@ -128,6 +148,16 @@ const config = {
 
   // TIMEZONE
   TIMEZONE: envVars.TIMEZONE,
+
+  // SMS OTP
+  SEND_CUSTOMER_OTP: envVars.SEND_CUSTOMER_OTP === "true",
+  SMS_BASE_URL: envVars.SMS_BASE_URL as string,
+  SMS_AUTH_KEY: envVars.SMS_AUTH_KEY as string,
+  SMS_DLT_TE_ID: envVars.SMS_DLT_TE_ID as string,
+  SMS_SENDER: envVars.SMS_SENDER as string,
+  SMS_ROUTE: envVars.SMS_ROUTE as string,
+  SMS_MESSAGE: (envVars.SMS_MESSAGE || "Your OTP for mobile verification is %otp% IBITOT") as string,
+  SMS_KEYWORD: (envVars.SMS_KEYWORD || "%otp%") as string,
 };
 
 export default config;

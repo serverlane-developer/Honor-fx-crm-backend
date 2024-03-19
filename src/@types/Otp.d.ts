@@ -1,4 +1,4 @@
-export type otp_type = "admin_login" | "toggle_2fa";
+export type otp_type = "admin_login" | "toggle_2fa" | "customer_login";
 
 export interface OtpObject {
   token: string;

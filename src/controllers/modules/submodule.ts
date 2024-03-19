@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import logger from "../../utils/logger";
-import { Request } from "../../@types/Express";
+import { AdminRequest } from "../../@types/Express";
 
 import * as moduleRepo from "../../db_services/modules_repo";
 import * as submoduleRepo from "../../db_services/submodules_repo";
@@ -9,7 +9,7 @@ import { Module, Submodule } from "../../@types/database";
 import { count } from "../../@types/Knex";
 import validators from "../../validators";
 
-const createSubmodule = async (req: Request, res: Response) => {
+const createSubmodule = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, body } = req;
   try {
     const { submodule_name, module_id }: { submodule_name: string; module_id: string } = body;
@@ -57,7 +57,7 @@ const createSubmodule = async (req: Request, res: Response) => {
   }
 };
 
-const updateSubmodule = async (req: Request, res: Response) => {
+const updateSubmodule = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, body, params } = req;
   const { submodule_id } = params;
   try {
@@ -130,7 +130,7 @@ const updateSubmodule = async (req: Request, res: Response) => {
   }
 };
 
-const getSubmodule = async (req: Request, res: Response) => {
+const getSubmodule = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params } = req;
   const { submodule_id } = params;
   try {
@@ -159,7 +159,7 @@ const getSubmodule = async (req: Request, res: Response) => {
   }
 };
 
-const getSubmodules = async (req: Request, res: Response) => {
+const getSubmodules = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, query } = req;
   try {
     const { limit: qLimit, skip: qSkip, module_id: qModuleId } = query;
@@ -222,7 +222,7 @@ const getSubmodules = async (req: Request, res: Response) => {
   }
 };
 
-const getSubmodulesForRoleAssignment = async (req: Request, res: Response) => {
+const getSubmodulesForRoleAssignment = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId } = req;
   try {
     let submodules = (await submoduleRepo.getSubmodulesForRoleAssignment()) as Partial<Submodule & Module>[];
@@ -245,7 +245,7 @@ const getSubmodulesForRoleAssignment = async (req: Request, res: Response) => {
   }
 };
 
-const deleteSubmodule = async (req: Request, res: Response) => {
+const deleteSubmodule = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params, body } = req;
   const { submodule_id } = params;
   const { is_deleted }: { is_deleted: boolean } = body;

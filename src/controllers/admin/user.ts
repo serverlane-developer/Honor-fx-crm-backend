@@ -2,14 +2,14 @@ import { Response } from "express";
 import bcrypt from "bcrypt";
 
 import logger from "../../utils/logger";
-import { Request } from "../../@types/Express";
+import { AdminRequest } from "../../@types/Express";
 
 import * as adminRepo from "../../db_services/admin_user_repo";
 import { AdminUser } from "../../@types/database";
 import { count } from "../../@types/Knex";
 import validators from "../../validators";
 
-const createAdmin = async (req: Request, res: Response) => {
+const createAdmin = async (req: AdminRequest, res: Response) => {
   const { body, requestId, user_id: created_by } = req;
   try {
     const { username, password, email, cnf_password, role_id } = body;
@@ -69,7 +69,7 @@ const createAdmin = async (req: Request, res: Response) => {
   }
 };
 
-const getAdminUsers = async (req: Request, res: Response) => {
+const getAdminUsers = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, query } = req;
   try {
     const { limit: qLimit, skip: qSkip } = query;
@@ -104,7 +104,7 @@ const getAdminUsers = async (req: Request, res: Response) => {
   }
 };
 
-const getAdminById = async (req: Request, res: Response) => {
+const getAdminById = async (req: AdminRequest, res: Response) => {
   const { requestId, params } = req;
   const { user_id } = params;
   try {
@@ -133,7 +133,7 @@ const getAdminById = async (req: Request, res: Response) => {
   }
 };
 
-const updateAdmin = async (req: Request, res: Response) => {
+const updateAdmin = async (req: AdminRequest, res: Response) => {
   const { user_id: updated_by, requestId, body, params } = req;
   const { user_id } = params;
 
@@ -200,7 +200,7 @@ const updateAdmin = async (req: Request, res: Response) => {
   }
 };
 
-const deleteAdmin = async (req: Request, res: Response) => {
+const deleteAdmin = async (req: AdminRequest, res: Response) => {
   const { user_id: updated_by, requestId, params, body } = req;
   const { user_id } = params;
   const { is_deleted }: { is_deleted: boolean } = body;

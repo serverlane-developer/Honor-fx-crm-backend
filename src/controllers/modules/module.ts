@@ -1,7 +1,7 @@
 import { Response } from "express";
 
 import logger from "../../utils/logger";
-import { Request } from "../../@types/Express";
+import { AdminRequest } from "../../@types/Express";
 
 import { Module } from "../../@types/database";
 import { count } from "../../@types/Knex";
@@ -9,7 +9,7 @@ import { count } from "../../@types/Knex";
 import * as moduleRepo from "../../db_services/modules_repo";
 import validators from "../../validators";
 
-const createModule = async (req: Request, res: Response) => {
+const createModule = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, body } = req;
   try {
     const { module_name }: { module_name: string } = body;
@@ -47,7 +47,7 @@ const createModule = async (req: Request, res: Response) => {
   }
 };
 
-const updateModule = async (req: Request, res: Response) => {
+const updateModule = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, body, params } = req;
   const { module_id } = params;
 
@@ -93,7 +93,7 @@ const updateModule = async (req: Request, res: Response) => {
   }
 };
 
-const getModule = async (req: Request, res: Response) => {
+const getModule = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params } = req;
   const { module_id } = params;
   try {
@@ -122,7 +122,7 @@ const getModule = async (req: Request, res: Response) => {
   }
 };
 
-const getModules = async (req: Request, res: Response) => {
+const getModules = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, query } = req;
   try {
     const { limit: qLimit, skip: qSkip } = query;
@@ -157,7 +157,7 @@ const getModules = async (req: Request, res: Response) => {
   }
 };
 
-const deleteModule = async (req: Request, res: Response) => {
+const deleteModule = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params, body } = req;
   const { module_id } = params;
   const { is_deleted }: { is_deleted: boolean } = body;
@@ -196,7 +196,7 @@ const deleteModule = async (req: Request, res: Response) => {
   }
 };
 
-const getModulesForDropdown = async (req: Request, res: Response) => {
+const getModulesForDropdown = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId } = req;
   try {
     let modules = await moduleRepo.getModulesForDropdown();

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import myCache from "memory-cache";
 import logger from "../../utils/logger";
-import { Request } from "../../@types/Express";
+import { AdminRequest } from "../../@types/Express";
 
 import { knex } from "../../data/knex";
 
@@ -14,7 +14,7 @@ import * as roleRepo from "../../db_services/roles_repo";
 import * as accessControlRepo from "../../db_services/access_control_repo";
 import validators from "../../validators";
 
-const createRole = async (req: Request, res: Response) => {
+const createRole = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, body } = req;
   const trx = await knex.transaction();
   try {
@@ -95,7 +95,7 @@ const createRole = async (req: Request, res: Response) => {
   }
 };
 
-const updateRole = async (req: Request, res: Response) => {
+const updateRole = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, body, params } = req;
   const { role_id } = params;
   const trx = await knex.transaction();
@@ -186,7 +186,7 @@ const updateRole = async (req: Request, res: Response) => {
   }
 };
 
-const getRole = async (req: Request, res: Response) => {
+const getRole = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params } = req;
   const { role_id } = params;
   try {
@@ -218,7 +218,7 @@ const getRole = async (req: Request, res: Response) => {
   }
 };
 
-const getRoles = async (req: Request, res: Response) => {
+const getRoles = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, query } = req;
   try {
     const { limit: qLimit, skip: qSkip } = query;
@@ -253,7 +253,7 @@ const getRoles = async (req: Request, res: Response) => {
   }
 };
 
-const deleteRole = async (req: Request, res: Response) => {
+const deleteRole = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params, body } = req;
   const { role_id } = params;
   const { is_deleted }: { is_deleted: boolean } = body;
@@ -292,7 +292,7 @@ const deleteRole = async (req: Request, res: Response) => {
   }
 };
 
-const getAccessControl = async (req: Request, res: Response) => {
+const getAccessControl = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params } = req;
   const { role_id } = params;
   try {
@@ -341,7 +341,7 @@ const getAccessControl = async (req: Request, res: Response) => {
   }
 };
 
-const getRolesForDropdown = async (req: Request, res: Response) => {
+const getRolesForDropdown = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId } = req;
   try {
     const roles = (await roleRepo.getRolesForDropdown()) as Partial<Role>[];

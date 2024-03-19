@@ -1,72 +1,74 @@
 import { Response } from "express";
 
 import logger from "../../utils/logger";
-import { AdminRequest } from "../../@types/Express";
+import { CustomerRequest } from "../../@types/Express";
 
-import * as adminRepo from "../../db_services/admin_user_repo";
-import * as adminLoginLogRepo from "../../db_services/admin_login_log_repo";
+import * as customerRepo from "../../db_services/customer_repo";
+import * as customerLoginLogRepo from "../../db_services/customer_login_log_repo";
 
-import helpers from "../../helpers/helpers";
-import { AdminLoginLog } from "../../@types/database";
+import { Customer, CustomerLoginLog } from "../../@types/database";
 import { count } from "../../@types/Knex";
+import helpers from "../../helpers/helpers";
 
-const getProfile = async (req: AdminRequest, res: Response) => {
-  const { user_id, requestId } = req;
+const getProfile = async (req: CustomerRequest, res: Response) => {
+  const { customer_id, requestId } = req;
   try {
-    if (!user_id)
+    if (!customer_id)
       return res.status(400).json({
         status: false,
-        message: "User ID is required",
+        message: "Customer ID is required",
         data: null,
       });
 
-    const admin = await adminRepo.getAdminById(user_id);
+    const customer = req.customer as Customer;
 
     const resObj = {
-      username: admin?.username,
-      email: admin?.email,
-      mobile: admin?.mobile,
-      last_login_ip: admin?.last_login_ip,
-      last_login_timestamp: admin?.last_login_timestamp,
-      is_2fa_enabled: admin?.is_2fa_enabled,
-      password_changed_at: admin?.password_changed_at,
-      created_at: admin?.created_at,
+      username: customer.username,
+      email: customer.email,
+      phone_number: customer.phone_number,
+      is_2fa_enabled: customer.is_2fa_enabled,
+      last_login_at: customer.last_login_at,
+      last_login_ip: customer.last_login_ip,
+      created_at: customer.created_at,
+      updated_at: customer.updated_at,
+      pin_changed_at: customer.pin_changed_at,
+      is_pin_reset_required: customer.is_pin_reset_required,
     };
 
     return res.status(200).json({ status: true, message: "Profile Info.", data: resObj });
   } catch (err) {
     const message = "Error while fetching profile info";
-    logger.error(message, { err, user_id, requestId });
+    logger.error(message, { err, customer_id, requestId });
     return res.status(500).json({ status: false, message, data: null });
   }
 };
 
-const getLoginHistory = async (req: AdminRequest, res: Response) => {
-  const { query, requestId, user_id } = req;
+const getLoginHistory = async (req: CustomerRequest, res: Response) => {
+  const { query, requestId, customer_id } = req;
   try {
     const { limit: qLimit, skip: qSkip } = query;
     const limit = Number(qLimit || 0) || 0;
     const skip = Number(qSkip || 0) || 0;
 
-    if (!user_id) {
+    if (!customer_id) {
       return res.status(400).json({
         status: false,
-        message: "User ID is required to get Login History",
+        message: "Customer ID is required to get Login History",
         data: [],
       });
     }
 
-    let history = (await adminLoginLogRepo.getLoginHistory({
-      user_id: user_id,
+    let history = (await customerLoginLogRepo.getLoginHistory({
+      customer_id: customer_id,
       limit,
       skip,
       totalRecords: false,
-    })) as Partial<AdminLoginLog>[];
+    })) as Partial<CustomerLoginLog>[];
 
     let count = 0;
     if (history?.length) {
-      const allHistoryCount = (await adminLoginLogRepo.getLoginHistory({
-        user_id: user_id,
+      const allHistoryCount = (await customerLoginLogRepo.getLoginHistory({
+        customer_id: customer_id,
         limit: null,
         skip: null,
         totalRecords: true,
@@ -89,27 +91,27 @@ const getLoginHistory = async (req: AdminRequest, res: Response) => {
       });
   } catch (err) {
     const message = "Error while fetching profile info";
-    logger.error(message, { err, user_id, requestId });
+    logger.error(message, { err, customer_id, requestId });
     return res.status(500).json({ status: false, message, data: null });
   }
 };
 
-const get2faStatus = async (req: AdminRequest, res: Response) => {
-  const { user_id, requestId } = req;
+const get2faStatus = async (req: CustomerRequest, res: Response) => {
+  const { customer_id, requestId } = req;
   try {
-    if (!user_id)
+    if (!customer_id)
       return res.status(400).json({
         status: false,
-        message: "User ID is required",
+        message: "Customer ID is required",
         data: null,
       });
 
-    const status = await adminRepo.getAdmin2faStatusById(user_id);
+    const status = await customerRepo.getCustomerById(customer_id);
 
     return res.status(200).json({ status: true, message: "2fa Status.", data: status });
   } catch (err) {
     const message = "Error while fetching 2fa Status";
-    logger.error(message, { err, user_id, requestId });
+    logger.error(message, { err, customer_id, requestId });
     return res.status(500).json({ status: false, message, data: null });
   }
 };

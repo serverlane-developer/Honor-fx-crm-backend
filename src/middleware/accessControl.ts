@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import myCache from "memory-cache";
 
-import { Request } from "../@types/Express";
+import { AdminRequest } from "../@types/Express";
 import * as accessControlRepo from "../db_services/access_control_repo";
 import logger from "../utils/logger";
 
@@ -25,7 +25,7 @@ const methodRight = {
   DELETE: "can_delete",
 };
 
-const accessControl = async (req: Request, res: Response, next: NextFunction) => {
+const accessControl = async (req: AdminRequest, res: Response, next: NextFunction) => {
   const { user, requestId } = req;
   try {
     if (!user)

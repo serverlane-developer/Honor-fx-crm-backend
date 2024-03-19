@@ -36,6 +36,8 @@ const isFlagged = joi.object({
 
 const paymentReqMethod = joi.string().valid("IMPS", "NEFT");
 
+const pin = number.length(4);
+
 export default {
   username,
   password,
@@ -51,5 +53,6 @@ export default {
   boolean,
   isDeleted,
   paymentReqMethod,
-  isFlagged
+  isFlagged,
+  pin,
 };

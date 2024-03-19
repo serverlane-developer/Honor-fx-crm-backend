@@ -6,7 +6,7 @@ import moment from "moment";
 import { v4 } from "uuid";
 
 import logger from "../../utils/logger";
-import { Request } from "../../@types/Express";
+import { AdminRequest } from "../../@types/Express";
 
 import * as adminRepo from "../../db_services/admin_user_repo";
 import * as adminLoginLogRepo from "../../db_services/admin_login_log_repo";
@@ -18,9 +18,9 @@ import validators from "../../validators";
 import AdminUser from "../../@types/database/AdminUser";
 import { knex } from "../../data/knex";
 import mailHelper from "../../helpers/mailHelper";
-import { getJwtToken } from "../../helpers/login";
+import { getAdminJwtToken as getJwtToken } from "../../helpers/login";
 
-const signin = async (req: Request, res: Response) => {
+const signin = async (req: AdminRequest, res: Response) => {
   const { body, requestId } = req;
   const ip = helpers.getIp(req);
   const login_device = helpers.getDeviceDetails(req);
@@ -230,7 +230,7 @@ const signin = async (req: Request, res: Response) => {
   }
 };
 
-const verifyOtp = async (req: Request, res: Response) => {
+const verifyOtp = async (req: AdminRequest, res: Response) => {
   const { body, requestId } = req;
   const ip = helpers.getIp(req);
   const login_device = helpers.getDeviceDetails(req);
@@ -449,7 +449,7 @@ const verifyOtp = async (req: Request, res: Response) => {
   }
 };
 
-const resendOtp = async (req: Request, res: Response) => {
+const resendOtp = async (req: AdminRequest, res: Response) => {
   const { body, requestId } = req;
   try {
     const { email } = body;
@@ -506,7 +506,7 @@ const resendOtp = async (req: Request, res: Response) => {
   }
 };
 
-const signout = (req: Request, res: Response) => {
+const signout = (req: AdminRequest, res: Response) => {
   const { requestId } = req;
   try {
     // TODO: SIGNOUT RELATED ACTIVITES HERE | LOGOUT RECORD IF MAINTAINED
@@ -527,7 +527,7 @@ const signout = (req: Request, res: Response) => {
   }
 };
 
-const updatePassword = async (req: Request, res: Response) => {
+const updatePassword = async (req: AdminRequest, res: Response) => {
   const { body, requestId } = req;
   const user = req?.user as AdminUser;
   try {
@@ -589,7 +589,7 @@ const updatePassword = async (req: Request, res: Response) => {
   }
 };
 
-const forgotPassword = async (req: Request, res: Response) => {
+const forgotPassword = async (req: AdminRequest, res: Response) => {
   const { body, requestId } = req;
   try {
     const { email } = body;
@@ -642,7 +642,7 @@ const forgotPassword = async (req: Request, res: Response) => {
   }
 };
 
-const resetPassword = async (req: Request, res: Response) => {
+const resetPassword = async (req: AdminRequest, res: Response) => {
   const { body, requestId } = req;
   try {
     const { password, cnf_password, reset_token, email } = body;
@@ -712,7 +712,7 @@ const resetPassword = async (req: Request, res: Response) => {
   }
 };
 
-const toggle2faStatus = async (req: Request, res: Response) => {
+const toggle2faStatus = async (req: AdminRequest, res: Response) => {
   const { body, requestId } = req;
   const user = req?.user as AdminUser;
 
@@ -771,7 +771,7 @@ const toggle2faStatus = async (req: Request, res: Response) => {
   }
 };
 
-const confirm2faToggle = async (req: Request, res: Response) => {
+const confirm2faToggle = async (req: AdminRequest, res: Response) => {
   const { body, requestId } = req;
   const user = req.user as AdminUser;
   try {

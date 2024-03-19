@@ -8,7 +8,7 @@ import { migrate } from "./migrate";
 
 const server = app.listen(config.PORT, async () => {
   logger.info("Server Started", { port: config.PORT, requestId: "listen" });
-  migrate();
+  await migrate();
 });
 
 // Handle unhandled promise rejections

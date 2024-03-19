@@ -2,24 +2,24 @@ import { Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
 import moment from "moment";
 
-import { AdminRequest } from "../@types/Express";
+import { CustomerRequest } from "../@types/Express";
 import config from "../config";
 import logger from "../utils/logger";
 
-import * as adminRepo from "../db_services/admin_user_repo";
+import * as customerRepo from "../db_services/customer_repo";
 
 declare module "jsonwebtoken" {
   export interface JwtPayload {
     id?: string;
     type?: "customer" | "admin";
     iat?: number;
-    name?: string;
-    email?: string;
+    username?: string;
+    phone_number?: string;
     is_2fa_enabled?: boolean;
   }
 }
 
-export default async (req: AdminRequest, res: Response, next: NextFunction) => {
+export default async (req: CustomerRequest, res: Response, next: NextFunction) => {
   const { requestId } = req;
   try {
     let token = req.headers["authorization"] || req.headers["x-access-token"] || req.query.token || req.body.token;
@@ -39,16 +39,16 @@ export default async (req: AdminRequest, res: Response, next: NextFunction) => {
 
     const decoded = jwt.verify(token, config.JWT_SECRET) as jwt.JwtPayload;
 
-    const user_id = decoded.id;
+    const customer_id = decoded.id;
 
-    if (!user_id) {
+    if (!customer_id) {
       return res.status(403).json({ status: false, message: "Invalid Token!", data: null });
     }
 
     let user;
 
-    if (decoded.type === "admin") {
-      user = await adminRepo.getAdminById(user_id);
+    if (decoded.type === "customer") {
+      user = await customerRepo.getCustomerById(customer_id);
     }
 
     if (!user) {
@@ -64,16 +64,15 @@ export default async (req: AdminRequest, res: Response, next: NextFunction) => {
     let token_signed_at = decoded?.iat;
     if (token_signed_at) {
       token_signed_at *= 1000;
-      if (user.password_changed_at) {
-        const is_token_signed_before_password_change = moment(token_signed_at).isBefore(user.password_changed_at);
-        if (is_token_signed_before_password_change) {
+      if (user.pin_changed_at) {
+        const is_token_signed_before_pin_change = moment(token_signed_at).isBefore(user.pin_changed_at);
+        if (is_token_signed_before_pin_change) {
           return res.status(403).json({ status: false, message: "Invalid Token!", data: null });
         }
       }
     }
 
     // to check if token was signed before login
-    // const token_signed_at = decoded.created_at;
     // if (user.last_login_at) {
     //   const is_token_signed_before_last_login = moment(token_signed_at).isBefore(user.last_login_at);
     //   if (is_token_signed_before_last_login) {
@@ -81,8 +80,8 @@ export default async (req: AdminRequest, res: Response, next: NextFunction) => {
     //   }
     // }
 
-    req.user = user;
-    req.user_id = user.user_id;
+    req.customer = user;
+    req.customer_id = user.customer_id;
     return next();
   } catch (err) {
     logger.error("Error in auth middleware", { err, requestId });
