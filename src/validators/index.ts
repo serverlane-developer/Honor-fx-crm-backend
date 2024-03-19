@@ -5,5 +5,6 @@ import module from "./module";
 import submodule from "./submodule";
 import accessControl from "./accessControl";
 import customer from "./customer";
+import paymentGateway from "./paymentGateway";
 
-export default { common, adminUser, role, module, submodule, accessControl, customer };
+export default { common, adminUser, role, module, submodule, accessControl, customer, paymentGateway };

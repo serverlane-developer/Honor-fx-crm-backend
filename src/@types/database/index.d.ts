@@ -7,5 +7,20 @@ import AccessControl from "./AccessControl";
 
 import Customer from "./Customer";
 import CustomerLoginLog from "./CustomerLoginLog";
+import PaymentGateway from "./PaymentGateway";
+import Withdraw from "./Withdraw";
+import PgTransaction from "./PgTransaction";
 
-export { AdminUser, AdminLoginLog, Module, Submodule, Role, AccessControl, Customer, CustomerLoginLog };
+export {
+  AdminUser,
+  AdminLoginLog,
+  Module,
+  Submodule,
+  Role,
+  AccessControl,
+  Customer,
+  CustomerLoginLog,
+  PaymentGateway,
+  Withdraw,
+  PgTransaction,
+};

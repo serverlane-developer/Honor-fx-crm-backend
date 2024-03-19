@@ -11,12 +11,14 @@ interface Modules {
   modules: string[];
   roles: string[];
   admin: string[];
+  "payment gateway": string[];
 }
 
 const modules: Modules = {
   modules: ["module", "submodule"],
   roles: ["role"],
   admin: ["user"],
+  "payment gateway": ["payout"],
 };
 
 const moduleKeys = Object.keys(modules);

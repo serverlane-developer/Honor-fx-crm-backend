@@ -504,8 +504,6 @@ const register = async (req: Request, res: Response) => {
   const { body, requestId } = req;
   const ip = helpers.getIp(req);
   const login_device = helpers.getDeviceDetails(req);
-  let customer_id;
-  let two_factor_authenticated;
   const trx = await knex.transaction();
   try {
     const { phone_number, pin, email, username, cnf_pin } = body;
@@ -586,7 +584,7 @@ const register = async (req: Request, res: Response) => {
         is_attempt_success: true,
         message,
         ip,
-        two_factor_authenticated,
+        two_factor_authenticated: false,
         login_device,
         attempt_type: "otp",
       },
@@ -597,7 +595,7 @@ const register = async (req: Request, res: Response) => {
       newCustomer.customer_id,
       phone_number,
       newCustomer.username,
-      two_factor_authenticated || false
+      false
     );
 
     logger.debug(message, { requestId, customer_id });
