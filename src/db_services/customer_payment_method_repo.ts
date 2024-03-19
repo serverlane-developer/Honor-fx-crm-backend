@@ -41,6 +41,15 @@ export const getPaymentMethodByFilter = async (
   return query;
 };
 
+export const getPaymentMethodsByFilter = async (
+  filter: Partial<CustomerPaymentMethod>,
+  { trx }: trx = {}
+): Promise<CustomerPaymentMethod[]> => {
+  const query = (trx || knexRead)(tablename).select("*").where(filter);
+  // console.log(query.toString());
+  return query;
+};
+
 export const updatePaymentMethod = async (
   filter: Partial<CustomerPaymentMethod>,
   update: Partial<CustomerPaymentMethod>,

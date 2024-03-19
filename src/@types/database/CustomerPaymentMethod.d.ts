@@ -1,6 +1,6 @@
 export const enum PaymentMethod {
-  IMPS = "IMPS",
-  NEFT = "NEFT",
+  BANK = "bank",
+  UPI = "upi",
 }
 
 export type payment_method = keyof typeof PaymentMethod;

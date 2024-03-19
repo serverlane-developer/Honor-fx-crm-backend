@@ -15,13 +15,13 @@ import {
   FinixPay,
 } from "../../@types/Payout";
 
-import { Status, transaction_status } from "../../@types/database/Withdraw";
+import { Status, payment_req_method, transaction_status } from "../../@types/database/Withdraw";
 
 import logger from "../../utils/logger";
 
 import * as withdrawRepo from "../../db_services/withdraw_repo";
 import * as pgTransactionRepo from "../../db_services/pg_transaction_repo";
-import CustomerPaymentMethod, { payment_method } from "../../@types/database/CustomerPaymentMethod";
+import CustomerPaymentMethod from "../../@types/database/CustomerPaymentMethod";
 // import { getSourceTransaction } from "../../helpers/withdrawEncryption";
 
 const parsePgOrderIdForIserverU = (id = "") => id.replace(/-/g, "").slice(0, 14); // IServeU
@@ -31,7 +31,7 @@ const createPaymentData = (
   transaction: Partial<Withdraw>,
   customer: Customer,
   customer_payment_method: CustomerPaymentMethod,
-  mode: payment_method,
+  mode: payment_req_method,
   requestId: requestId
 ) => {
   const { amount: amt, transaction_id } = transaction as Withdraw;

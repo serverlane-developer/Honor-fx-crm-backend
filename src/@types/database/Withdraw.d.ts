@@ -1,4 +1,9 @@
-import { payment_method } from "./CustomerPaymentMethod";
+const enum PaymentMethod {
+  IMPS = "IMPS",
+  NEFT = "NEFT",
+}
+
+type payment_req_method = keyof typeof PaymentMethod;
 
 const enum Status {
   PENDING = "pending",
@@ -39,7 +44,7 @@ interface Withdraw {
   pg_id: string | null;
   payment_status: string | null;
   payment_fail_count: number;
-  payment_req_method: payment_method | null;
+  payment_req_method: payment_req_method | null;
   utr_id: string | null;
   payment_creation_date: string | null;
   payment_order_id: string | null;
@@ -47,6 +52,6 @@ interface Withdraw {
   pg_order_id: string | null;
 }
 
-export { Status, transaction_status };
+export { Status, transaction_status, PaymentMethod, payment_req_method };
 
 export default Withdraw;
