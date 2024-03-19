@@ -2,61 +2,61 @@ import { v4 as uuidv4 } from "uuid";
 import { Knex } from "knex";
 
 import { count, trx } from "../@types/Knex";
-import { PaymentGateway } from "../@types/database";
+import { PayoutGateway } from "../@types/database";
 
 import { knex, knexRead } from "../data/knex";
 
 import { PaginationParams } from "../@types/Common";
 import { PaymentMethod, payment_req_method } from "../@types/database/Withdraw";
 
-const tablename = "payment_gateway";
+const tablename = "payout_gateway";
 
-export const createPaymentGateway = async (
-  object: Partial<PaymentGateway>,
+export const createPayoutGateway = async (
+  object: Partial<PayoutGateway>,
   pg_id: string = uuidv4(),
   { trx }: trx = {}
-): Promise<PaymentGateway | null> => {
+): Promise<PayoutGateway | null> => {
   object.pg_id = pg_id;
   const query = (trx || knex)(tablename).returning("*").insert(object);
   const result = await query;
-  return result?.[0] as unknown as PaymentGateway;
+  return result?.[0] as unknown as PayoutGateway;
 };
 
-export const getPaymentGatewayById = async (pg_id: string, { trx }: trx = {}): Promise<PaymentGateway | null> => {
+export const getPayoutGatewayById = async (pg_id: string, { trx }: trx = {}): Promise<PayoutGateway | null> => {
   if (!pg_id) throw new Error("Payment gateway ID is required");
   const query = (trx || knexRead)(tablename).where({ pg_id }).where({ is_deleted: false }).select("*").first();
   return query;
 };
 
-export const getPaymentGatewayByFilter = async (
-  filter: Partial<PaymentGateway>,
+export const getPayoutGatewayByFilter = async (
+  filter: Partial<PayoutGateway>,
   { trx }: trx = {}
-): Promise<PaymentGateway | null> => {
+): Promise<PayoutGateway | null> => {
   const query = (trx || knexRead)(tablename).select("*").where(filter).first();
   // console.log(query.toString());
   return query;
 };
 
-export const getActivePG = async ({ trx }: trx = {}): Promise<PaymentGateway | null> => {
+export const getActivePG = async ({ trx }: trx = {}): Promise<PayoutGateway | null> => {
   const query = (trx || knexRead)(tablename).select("*").where({ is_deleted: false }).first();
   // console.log(query.toString());
   return query;
 };
 
-export const updatePaymentGateway = async (
-  filter: Partial<PaymentGateway>,
-  update: Partial<PaymentGateway>,
+export const updatePayoutGateway = async (
+  filter: Partial<PayoutGateway>,
+  update: Partial<PayoutGateway>,
   { trx }: trx = {}
-): Promise<PaymentGateway | null> => {
-  const query: Knex.QueryBuilder<PaymentGateway, PaymentGateway[]> = (trx || knex)<PaymentGateway>(tablename)
+): Promise<PayoutGateway | null> => {
+  const query: Knex.QueryBuilder<PayoutGateway, PayoutGateway[]> = (trx || knex)<PayoutGateway>(tablename)
     .returning("*")
     .where(filter)
     .update(update);
   const result = await query;
-  return result[0] as unknown as PaymentGateway;
+  return result[0] as unknown as PayoutGateway;
 };
 
-export const softDeletePaymentGateway = async (filter: Partial<PaymentGateway>, { trx }: trx = {}): Promise<void> => {
+export const softDeletePayoutGateway = async (filter: Partial<PayoutGateway>, { trx }: trx = {}): Promise<void> => {
   return (trx || knex)(tablename).returning("*").where(filter).update({ is_deleted: true });
 };
 
@@ -65,7 +65,7 @@ export const getAllGateways = async ({
   skip,
   status,
   totalRecords = false,
-}: PaginationParams): Promise<Partial<PaymentGateway>[] | count> => {
+}: PaginationParams): Promise<Partial<PayoutGateway>[] | count> => {
   if (totalRecords) {
     const countQuery = knexRead(tablename)
       .select(knexRead.raw("count(pg_id) as count"))
@@ -108,7 +108,7 @@ export const getAllGateways = async ({
   return query;
 };
 
-export const getPaymentMethod = (pg: PaymentGateway, amount: number): payment_req_method | null => {
+export const getPaymentMethod = (pg: PayoutGateway, amount: number): payment_req_method | null => {
   const { imps_enabled, imps_max, imps_min, neft_enabled, neft_max, neft_min } = pg;
   if (amount >= Number(imps_min || 0) && amount <= Number(imps_max || 0) && imps_enabled) {
     return PaymentMethod.IMPS;

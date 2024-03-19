@@ -2,7 +2,7 @@ import axios from "axios";
 import logger from "../../utils/logger";
 import { AccountTransferResponse, ISmartPay } from "../../@types/Payout";
 import { requestId } from "../../@types/Common";
-import { PaymentGateway } from "../../@types/database";
+import { PayoutGateway } from "../../@types/database";
 import { decrypt } from "../../helpers/cipher";
 
 const ENDPOINTS = {
@@ -16,7 +16,7 @@ const getHeaders = ({ MERCHANT_ID, SECRET }: { MERCHANT_ID: string; SECRET: stri
   key: SECRET,
 });
 
-const getKeys = (pg: PaymentGateway) => ({
+const getKeys = (pg: PayoutGateway) => ({
   PAYMENT_BASE_URL: decrypt(pg.base_url || ""),
   MERCHANT_ID: decrypt(pg.merchant_id || ""),
   SECRET: decrypt(pg.secret_key || ""),
@@ -24,7 +24,7 @@ const getKeys = (pg: PaymentGateway) => ({
 });
 
 const accountTransfer = async (
-  pg: PaymentGateway,
+  pg: PayoutGateway,
   data: ISmartPay.PayoutRequest,
   requestId: requestId
 ): Promise<AccountTransferResponse> => {
@@ -107,7 +107,7 @@ const accountTransfer = async (
   }
 };
 
-const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: requestId) => {
+const getTransationStatus = async (pg: PayoutGateway, id: string, requestId: requestId) => {
   const { MERCHANT_ID, PAYMENT_BASE_URL, SECRET } = getKeys(pg);
   const url = PAYMENT_BASE_URL + ENDPOINTS.STATUS + "/" + id;
 
@@ -128,7 +128,7 @@ const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: re
   return data as ISmartPay.StatusResponse;
 };
 
-const getBalance = async (pg: PaymentGateway, requestId: requestId) => {
+const getBalance = async (pg: PayoutGateway, requestId: requestId) => {
   try {
     const { MERCHANT_ID, PAYMENT_BASE_URL, SECRET, WALLET_ID } = getKeys(pg);
     const url = PAYMENT_BASE_URL + ENDPOINTS.BALANCE;

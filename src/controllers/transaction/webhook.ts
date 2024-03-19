@@ -7,7 +7,7 @@ import { PayoutServices, payoutHelper } from "../../services/payout";
 import zapayService from "../../services/payout/zapay";
 
 import * as transanctionRepo from "../../db_services/withdraw_repo";
-import * as pgRepo from "../../db_services/payment_gateway_repo";
+import * as pgRepo from "../../db_services/payout_gateway_repo";
 
 import validators from "../../validators/common";
 import { ISmartPay, PayAnyTime, ZaPay } from "../../@types/Payout";
@@ -67,7 +67,7 @@ const paycoons = async (req: Request, res: Response) => {
       });
     }
 
-    const pg = await pgRepo.getPaymentGatewayById(transaction.pg_id);
+    const pg = await pgRepo.getPayoutGatewayById(transaction.pg_id);
     if (!pg) {
       const message = "Payment Gateway not found";
       logger.debug(message, { requestId, transaction, body });
@@ -148,7 +148,7 @@ const zapay = async (req: Request, res: Response) => {
       });
     }
 
-    const pg = await pgRepo.getPaymentGatewayById(transaction.pg_id);
+    const pg = await pgRepo.getPayoutGatewayById(transaction.pg_id);
     if (!pg) {
       const message = "Payment Gateway not found";
       logger.debug(message, { requestId, transaction, body });
@@ -229,7 +229,7 @@ const ismartpay = async (req: Request, res: Response) => {
       });
     }
 
-    const pg = await pgRepo.getPaymentGatewayById(transaction.pg_id);
+    const pg = await pgRepo.getPayoutGatewayById(transaction.pg_id);
     if (!pg) {
       const message = "Payment Gateway not found";
       logger.debug(message, { requestId, transaction, body });
@@ -297,7 +297,7 @@ const payanytime = async (req: Request, res: Response) => {
       });
     }
 
-    const pg = await pgRepo.getPaymentGatewayById(transaction.pg_id);
+    const pg = await pgRepo.getPayoutGatewayById(transaction.pg_id);
     if (!pg) {
       const message = "Payment Gateway not found";
       logger.info(message, { requestId, transaction, body });
@@ -369,7 +369,7 @@ const finixpay = async (req: Request, res: Response) => {
       });
     }
 
-    const pg = await pgRepo.getPaymentGatewayById(transaction.pg_id);
+    const pg = await pgRepo.getPayoutGatewayById(transaction.pg_id);
     if (!pg) {
       const message = "Payment Gateway not found";
       logger.info(message, { requestId, transaction, body });

@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 
-const TABLE_NAME = "payment_gateway";
+const TABLE_NAME = "payout_gateway";
 const LOG_TABLE_NAME = `${TABLE_NAME}_logs`;
 
 const columns = [

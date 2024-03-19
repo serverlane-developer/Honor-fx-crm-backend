@@ -7,7 +7,7 @@ import AccessControl from "./AccessControl";
 
 import Customer from "./Customer";
 import CustomerLoginLog from "./CustomerLoginLog";
-import PaymentGateway from "./PaymentGateway";
+import PayoutGateway from "./PayoutGateway";
 import Withdraw from "./Withdraw";
 import PgTransaction from "./PgTransaction";
 import CustomerPaymentMethod from "./CustomerPaymentMethod";
@@ -21,7 +21,7 @@ export {
   AccessControl,
   Customer,
   CustomerLoginLog,
-  PaymentGateway,
+  PayoutGateway,
   Withdraw,
   PgTransaction,
   CustomerPaymentMethod

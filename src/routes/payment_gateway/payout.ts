@@ -1,15 +1,15 @@
 import express from "express";
 
-import pgCtrl from "../../controllers/payment_gateway";
+import payoutCtrl from "../../controllers/payment_gateway/payout";
 
 const router = express.Router();
 
-router.post("/", pgCtrl.createPaymentGateway);
-router.put("/:pg_id", pgCtrl.updatePaymentGateway);
-router.delete("/:pg_id", pgCtrl.deletePaymentGateway);
+router.post("/", payoutCtrl.createPayoutGateway);
+router.put("/:pg_id", payoutCtrl.updatePayoutGateway);
+router.delete("/:pg_id", payoutCtrl.deletePayoutGateway);
 
-router.get("/balance/:pg_id", pgCtrl.getBalance);
-router.get("/:pg_id", pgCtrl.getPaymentGatewayById);
-router.get("/", pgCtrl.getPaymentGateways);
+router.get("/balance/:pg_id", payoutCtrl.getBalance);
+router.get("/:pg_id", payoutCtrl.getPayoutGatewayById);
+router.get("/", payoutCtrl.getPayoutGateways);
 
 export default router;

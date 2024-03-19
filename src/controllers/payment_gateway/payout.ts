@@ -6,15 +6,15 @@ import { AdminRequest } from "../../@types/Express";
 import logger from "../../utils/logger";
 import validators from "../../validators";
 
-import * as pgRepo from "../../db_services/payment_gateway_repo";
-import { PaymentGateway } from "../../@types/database";
+import * as pgRepo from "../../db_services/payout_gateway_repo";
+import { PayoutGateway } from "../../@types/database";
 import { count } from "../../@types/Knex";
 import { PayoutServices } from "../../services/payout";
 import { PAYOUT } from "../../@types/Payout";
 import { knex } from "../../data/knex";
 import { decrypt, encrypt } from "../../helpers/cipher";
 
-const createPaymentGateway = async (req: AdminRequest, res: Response) => {
+const createPayoutGateway = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, body } = req;
   const pg_id = v4();
   const trx = await knex.transaction();
@@ -88,7 +88,7 @@ const createPaymentGateway = async (req: AdminRequest, res: Response) => {
       client_id: client_id ? encrypt(client_id) : null,
     };
 
-    const pgExists = await pgRepo.getPaymentGatewayByFilter({ nickname });
+    const pgExists = await pgRepo.getPayoutGatewayByFilter({ nickname });
     if (pgExists) {
       await trx.rollback();
       return res.status(400).json({
@@ -98,7 +98,7 @@ const createPaymentGateway = async (req: AdminRequest, res: Response) => {
       });
     }
 
-    const pg = (await pgRepo.createPaymentGateway(
+    const pg = (await pgRepo.createPayoutGateway(
       {
         pg_id,
         ...pgObject,
@@ -107,7 +107,7 @@ const createPaymentGateway = async (req: AdminRequest, res: Response) => {
       },
       pg_id,
       { trx }
-    )) as PaymentGateway;
+    )) as PayoutGateway;
 
     const balanceRes = await PayoutServices[pg_service as PAYOUT].getBalance(pg, requestId);
 
@@ -136,7 +136,7 @@ const createPaymentGateway = async (req: AdminRequest, res: Response) => {
   }
 };
 
-const updatePaymentGateway = async (req: AdminRequest, res: Response) => {
+const updatePayoutGateway = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, body, params } = req;
   const { pg_id } = params;
   const trx = await knex.transaction();
@@ -210,7 +210,7 @@ const updatePaymentGateway = async (req: AdminRequest, res: Response) => {
       client_id: client_id ? encrypt(client_id) : null,
     };
 
-    const pgExists = await pgRepo.getPaymentGatewayByFilter({ pg_id });
+    const pgExists = await pgRepo.getPayoutGatewayByFilter({ pg_id });
     if (!pgExists) {
       await trx.rollback();
       return res.status(400).json({
@@ -220,7 +220,7 @@ const updatePaymentGateway = async (req: AdminRequest, res: Response) => {
       });
     }
 
-    const sameNameExists = await pgRepo.getPaymentGatewayByFilter({ nickname });
+    const sameNameExists = await pgRepo.getPayoutGatewayByFilter({ nickname });
     if (sameNameExists && sameNameExists.pg_id !== pg_id) {
       await trx.rollback();
       return res.status(400).json({
@@ -230,11 +230,11 @@ const updatePaymentGateway = async (req: AdminRequest, res: Response) => {
       });
     }
 
-    const pg = (await pgRepo.updatePaymentGateway(
+    const pg = (await pgRepo.updatePayoutGateway(
       { pg_id },
       { ...pgObject, updated_by: user_id },
       { trx }
-    )) as PaymentGateway;
+    )) as PayoutGateway;
 
     const balanceRes = await PayoutServices[pg_service as PAYOUT].getBalance(pg, requestId);
 
@@ -264,7 +264,7 @@ const updatePaymentGateway = async (req: AdminRequest, res: Response) => {
   }
 };
 
-const deletePaymentGateway = async (req: AdminRequest, res: Response) => {
+const deletePayoutGateway = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, body, params } = req;
   const { pg_id } = params;
   const { is_deleted } = body;
@@ -282,7 +282,7 @@ const deletePaymentGateway = async (req: AdminRequest, res: Response) => {
       });
     }
 
-    const pgExists = await pgRepo.getPaymentGatewayByFilter({ pg_id });
+    const pgExists = await pgRepo.getPayoutGatewayByFilter({ pg_id });
     if (!pgExists) {
       return res.status(400).json({
         status: false,
@@ -313,7 +313,7 @@ const deletePaymentGateway = async (req: AdminRequest, res: Response) => {
       }
     }
 
-    const pg = await pgRepo.updatePaymentGateway({ pg_id }, { is_deleted, updated_by: user_id });
+    const pg = await pgRepo.updatePayoutGateway({ pg_id }, { is_deleted, updated_by: user_id });
     return res.status(200).json({
       status: true,
       data: pg,
@@ -326,7 +326,7 @@ const deletePaymentGateway = async (req: AdminRequest, res: Response) => {
   }
 };
 
-const getPaymentGatewayById = async (req: AdminRequest, res: Response) => {
+const getPayoutGatewayById = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params } = req;
   const { pg_id } = params;
 
@@ -342,7 +342,7 @@ const getPaymentGatewayById = async (req: AdminRequest, res: Response) => {
       });
     }
 
-    const pgExists = await pgRepo.getPaymentGatewayByFilter({ pg_id });
+    const pgExists = await pgRepo.getPayoutGatewayByFilter({ pg_id });
     if (!pgExists) {
       return res.status(400).json({
         status: false,
@@ -372,7 +372,7 @@ const getPaymentGatewayById = async (req: AdminRequest, res: Response) => {
   }
 };
 
-const getPaymentGateways = async (req: AdminRequest, res: Response) => {
+const getPayoutGateways = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, query } = req;
 
   try {
@@ -380,7 +380,7 @@ const getPaymentGateways = async (req: AdminRequest, res: Response) => {
     const limit = Number(qLimit || 0) || 0;
     const skip = Number(qSkip || 0) || 0;
     const status = qStatus === "enable" ? true : false;
-    const pgList = (await pgRepo.getAllGateways({ limit, skip, status })) as Partial<PaymentGateway>[];
+    const pgList = (await pgRepo.getAllGateways({ limit, skip, status })) as Partial<PayoutGateway>[];
     let count = 0;
 
     if (pgList?.length) {
@@ -425,7 +425,7 @@ const getBalance = async (req: AdminRequest, res: Response) => {
       });
     }
 
-    const pgExists = await pgRepo.getPaymentGatewayByFilter({ pg_id });
+    const pgExists = await pgRepo.getPayoutGatewayByFilter({ pg_id });
     if (!pgExists) {
       return res.status(400).json({
         status: false,
@@ -449,10 +449,10 @@ const getBalance = async (req: AdminRequest, res: Response) => {
 };
 
 export default {
-  createPaymentGateway,
-  updatePaymentGateway,
-  deletePaymentGateway,
-  getPaymentGatewayById,
-  getPaymentGateways,
+  createPayoutGateway,
+  updatePayoutGateway,
+  deletePayoutGateway,
+  getPayoutGatewayById,
+  getPayoutGateways,
   getBalance,
 };

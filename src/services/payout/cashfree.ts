@@ -5,7 +5,7 @@ import logger from "../../utils/logger";
 
 import { AccountTransferResponse, CashFree } from "../../@types/Payout";
 import { requestId } from "../../@types/Common";
-import { PaymentGateway } from "../../@types/database";
+import { PayoutGateway } from "../../@types/database";
 import { decrypt } from "../../helpers/cipher";
 
 const CACHE_KEY = `cashfree_api_token`;
@@ -18,14 +18,14 @@ const ENDPOINTS = {
   VERIFY_TOKEN: "/payout/v1/verifyToken",
 };
 
-const getKeys = (pg: PaymentGateway) => ({
+const getKeys = (pg: PayoutGateway) => ({
   PAYMENT_BASE_URL: decrypt(pg.base_url || ""),
   CLIENT_ID: decrypt(pg.client_id || ""),
   CLIENT_SECRET: decrypt(pg.secret_key || ""),
 });
 
 const accountTransfer = async (
-  pg: PaymentGateway,
+  pg: PayoutGateway,
   data: CashFree.PayoutRequest,
   requestId: requestId
 ): Promise<AccountTransferResponse> => {
@@ -100,7 +100,7 @@ const accountTransfer = async (
   }
 };
 
-const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: requestId) => {
+const getTransationStatus = async (pg: PayoutGateway, id: string, requestId: requestId) => {
   const { PAYMENT_BASE_URL } = getKeys(pg);
   const url = `${PAYMENT_BASE_URL}${ENDPOINTS.STATUS}?transferId=${id}`;
   const token = await getAuthToken(pg, 0, false, requestId);
@@ -127,7 +127,7 @@ const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: re
 // authenticate and verify before each network call
 // if verify returns 403 | retry authenticate | COUNT 3
 const getAuthToken = async (
-  pg: PaymentGateway,
+  pg: PayoutGateway,
   retryCount = 0,
   resetCache = false,
   requestId: requestId
@@ -175,7 +175,7 @@ const getAuthToken = async (
   }
 };
 
-const authenticate = async (pg: PaymentGateway, requestId: requestId) => {
+const authenticate = async (pg: PayoutGateway, requestId: requestId) => {
   try {
     const { CLIENT_ID, CLIENT_SECRET, PAYMENT_BASE_URL } = getKeys(pg);
     const url = PAYMENT_BASE_URL + ENDPOINTS.AUTHENTICATE;
@@ -201,7 +201,7 @@ const authenticate = async (pg: PaymentGateway, requestId: requestId) => {
   }
 };
 
-const verifyToken = async (pg: PaymentGateway, token: string, requestId: requestId) => {
+const verifyToken = async (pg: PayoutGateway, token: string, requestId: requestId) => {
   try {
     const { PAYMENT_BASE_URL } = getKeys(pg);
     logger.info(`Trying to verify cashfree payout api's api token`, { requestId });
@@ -231,7 +231,7 @@ const verifyToken = async (pg: PaymentGateway, token: string, requestId: request
   }
 };
 
-const getBalance = async (pg: PaymentGateway, requestId: requestId) => {
+const getBalance = async (pg: PayoutGateway, requestId: requestId) => {
   try {
     const token = await getAuthToken(pg, 0, false, requestId);
 

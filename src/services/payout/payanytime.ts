@@ -5,7 +5,7 @@ import logger from "../../utils/logger";
 
 import { AccountTransferResponse, PayAnyTime } from "../../@types/Payout";
 import { requestId } from "../../@types/Common";
-import { PaymentGateway } from "../../@types/database";
+import { PayoutGateway } from "../../@types/database";
 import { decrypt } from "../../helpers/cipher";
 
 const CACHE_KEY = `payanytime_api_token`;
@@ -17,14 +17,14 @@ const ENDPOINTS = {
   AUTHENTICATE: "/api/v2/login",
 };
 
-const getKeys = (pg: PaymentGateway) => ({
+const getKeys = (pg: PayoutGateway) => ({
   PAYMENT_BASE_URL: decrypt(pg.base_url || ""),
   EMAIL: decrypt(pg.merchant_id || ""),
   PASSWORD: decrypt(pg.secret_key || ""),
 });
 
 const accountTransfer = async (
-  pg: PaymentGateway,
+  pg: PayoutGateway,
   data: PayAnyTime.PayoutRequest,
   requestId: requestId
 ): Promise<AccountTransferResponse> => {
@@ -143,7 +143,7 @@ const accountTransfer = async (
   }
 };
 
-const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: requestId) => {
+const getTransationStatus = async (pg: PayoutGateway, id: string, requestId: requestId) => {
   const { PAYMENT_BASE_URL } = getKeys(pg);
 
   // const transaction = await pgTransactionRepo.getPgTransactionByFilter({ pg_order_id: id });
@@ -177,7 +177,7 @@ const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: re
 
 // authenticate before each network call
 const getAuthToken = async (
-  pg: PaymentGateway,
+  pg: PayoutGateway,
   retryCount = 0,
   resetCache = false,
   requestId: requestId
@@ -218,7 +218,7 @@ const getAuthToken = async (
   }
 };
 
-const authenticate = async (pg: PaymentGateway, requestId: requestId) => {
+const authenticate = async (pg: PayoutGateway, requestId: requestId) => {
   try {
     const { PAYMENT_BASE_URL, EMAIL, PASSWORD } = getKeys(pg);
     const url = PAYMENT_BASE_URL + ENDPOINTS.AUTHENTICATE;
@@ -242,7 +242,7 @@ const authenticate = async (pg: PaymentGateway, requestId: requestId) => {
   }
 };
 
-const getBalance = async (pg: PaymentGateway, requestId: requestId) => {
+const getBalance = async (pg: PayoutGateway, requestId: requestId) => {
   try {
     const token = await getAuthToken(pg, 0, false, requestId);
 

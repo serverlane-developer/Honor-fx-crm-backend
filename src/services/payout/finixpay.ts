@@ -3,7 +3,7 @@ import logger from "../../utils/logger";
 import { AccountTransferResponse, FinixPay } from "../../@types/Payout";
 import { requestId } from "../../@types/Common";
 import { decrypt } from "../../helpers/cipher";
-import { PaymentGateway } from "../../@types/database";
+import { PayoutGateway } from "../../@types/database";
 
 const ENDPOINTS = {
   PAYOUT: "/FinixPayPayout2",
@@ -25,7 +25,7 @@ const getBody = ({
   clientSecretKey: SECRET_KEY,
 });
 
-const getKeys = (pg: PaymentGateway) => ({
+const getKeys = (pg: PayoutGateway) => ({
   PAYMENT_BASE_URL: decrypt(pg.base_url || ""),
   CLIENT_ID: decrypt(pg.client_id || ""),
   SECRET_KEY: decrypt(pg.secret_key || ""),
@@ -33,7 +33,7 @@ const getKeys = (pg: PaymentGateway) => ({
 });
 
 const accountTransfer = async (
-  pg: PaymentGateway,
+  pg: PayoutGateway,
   data: FinixPay.PayoutRequest,
   requestId: requestId
 ): Promise<AccountTransferResponse> => {
@@ -126,7 +126,7 @@ const accountTransfer = async (
   }
 };
 
-const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: requestId) => {
+const getTransationStatus = async (pg: PayoutGateway, id: string, requestId: requestId) => {
   const { CLIENT_ID, MERCHANT_ID, PAYMENT_BASE_URL, SECRET_KEY } = getKeys(pg);
   const url = `${PAYMENT_BASE_URL}${ENDPOINTS.STATUS}?payout_refno=${id}`;
   const config = {
@@ -156,7 +156,7 @@ const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: re
   return result;
 };
 
-const getBalance = async (pg: PaymentGateway, requestId: requestId) => {
+const getBalance = async (pg: PayoutGateway, requestId: requestId) => {
   try {
     const { CLIENT_ID, MERCHANT_ID, PAYMENT_BASE_URL, SECRET_KEY } = getKeys(pg);
     const url = PAYMENT_BASE_URL + ENDPOINTS.BALANCE;

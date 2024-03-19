@@ -72,7 +72,7 @@ export const getPgOrderIdHistory = (transaction_id: string) => {
   const query = knexRead(tablename)
     .select(columns)
     .where({ transaction_id })
-    .join("payment_gateway as pg", "pg.pg_id", "pg_transaction.pg_id")
+    .join("payout_gateway as pg", "pg.pg_id", "pg_transaction.pg_id")
     .orderBy("created_at", "desc");
   return query;
 };

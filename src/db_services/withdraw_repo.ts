@@ -160,7 +160,7 @@ export const getAllTransactions = async ({
     .orderBy(`t.${order}`, dir);
 
   if (showPgColumns) {
-    query = query.leftJoin("payment_gateway as pg", "t.pg_id", "pg.pg_id");
+    query = query.leftJoin("payout_gateway as pg", "t.pg_id", "pg.pg_id");
   }
 
   if (search) {
@@ -249,7 +249,7 @@ export const getTransactionsByRpaStatus = async ({
   let query = knexRead(`${tablename} as t`)
     .select(columns)
     .where({ rpa_status })
-    .leftJoin("payment_gateway as pg", "t.pg_id", "pg.pg_id")
+    .leftJoin("payout_gateway as pg", "t.pg_id", "pg.pg_id")
     .join("admin_user as cb", "t.created_by", "cb.user_id")
     .join("admin_user as ub", "t.updated_by", "ub.user_id")
     .orderBy(`t.${order}`, dir);
@@ -305,7 +305,7 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
   let query = knexRead
     .select(logColumns)
     .from(`${tablename}_logs as t`)
-    .leftJoin("payment_gateway as pg", knexRead.raw("CAST(t.pg_id as uuid) = pg.pg_id"))
+    .leftJoin("payout_gateway as pg", knexRead.raw("CAST(t.pg_id as uuid) = pg.pg_id"))
     .join("admin_user as au", knexRead.raw("CAST(t.updated_by as uuid) = au.user_id"))
     .where("t.transaction_id", id);
   query = query
@@ -319,7 +319,7 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
 
       qb.select(columns)
         .from(`${tablename} as t`)
-        .leftJoin("payment_gateway as pg", knexRead.raw("CAST(t.pg_id as uuid) = pg.pg_id"))
+        .leftJoin("payout_gateway as pg", knexRead.raw("CAST(t.pg_id as uuid) = pg.pg_id"))
         .join("admin_user as au", knexRead.raw("CAST(t.updated_by as uuid) = au.user_id"))
         .where("t.transaction_id", id);
     }, true)
@@ -411,7 +411,7 @@ export const getDetailedTransactionByFilter = async (filter: {
     .where(filter)
     .join("admin_user as cb", "t.created_by", "cb.user_id")
     .join("admin_user as ub", "t.updated_by", "ub.user_id")
-    .leftJoin("payment_gateway as pg", "t.pg_id", "pg.pg_id")
+    .leftJoin("payout_gateway as pg", "t.pg_id", "pg.pg_id")
     .first();
   // console.log(query.toString());
   return query;

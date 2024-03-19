@@ -48,7 +48,7 @@ export async function up(knex: Knex): Promise<void> {
       .nullable()
       .defaultTo(null)
       .references("pg_id")
-      .inTable("payment_gateway")
+      .inTable("payout_gateway")
       .onDelete("restrict")
       .comment("Payment Gateway used to proceed with transaction.");
     table.string("payment_status").nullable().defaultTo(null).comment("status from payment gateway");

@@ -9,7 +9,7 @@ import logger from "../utils/logger";
 import { PayoutServices, payoutHelper } from "../services/payout";
 
 import * as withdrawRepo from "../db_services/withdraw_repo";
-import * as pgRepo from "../db_services/payment_gateway_repo";
+import * as pgRepo from "../db_services/payout_gateway_repo";
 import * as pgTransactionsRepo from "../db_services/pg_transaction_repo";
 import * as customerRepo from "../db_services/customer_repo";
 import * as paymentMethodRepo from "../db_services/customer_payment_method_repo";
@@ -110,7 +110,7 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
       };
     }
 
-    const pg = await pgRepo.getPaymentGatewayById(pg_id, { trx });
+    const pg = await pgRepo.getPayoutGatewayById(pg_id, { trx });
     if (!pg) {
       const message = "Payment gateway not found";
       logger.debug(message, { message, requestId });

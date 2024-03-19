@@ -6,7 +6,7 @@ import { CustomerRequest } from "../../@types/Express";
 
 import * as paymentMethodRepo from "../../db_services/customer_payment_method_repo";
 import * as withdrawRepo from "../../db_services/withdraw_repo";
-import * as pgRepo from "../../db_services/payment_gateway_repo";
+import * as pgRepo from "../../db_services/payout_gateway_repo";
 
 import validators from "../../validators";
 import { knex } from "../../data/knex";
@@ -59,7 +59,7 @@ const createWithdraw = async (req: CustomerRequest, res: Response) => {
       });
     }
 
-    const pg = await pgRepo.getPaymentGatewayById(pg_id);
+    const pg = await pgRepo.getPayoutGatewayById(pg_id);
     if (!pg) {
       const message = "Payment Gateway nor found";
       logger.debug(message, { message, requestId });

@@ -5,7 +5,7 @@ import logger from "../../utils/logger";
 import * as withdrawRepo from "../../db_services/withdraw_repo";
 import { AccountTransferResponse, Iserveu } from "../../@types/Payout";
 import { requestId } from "../../@types/Common";
-import { PaymentGateway } from "../../@types/database";
+import { PayoutGateway } from "../../@types/database";
 import { decrypt } from "../../helpers/cipher";
 import { parsePgOrderIdForIserverU } from "./helper";
 
@@ -13,7 +13,7 @@ const ENDPOINTS = {
   PAYOUT: "/cashtransfer",
 };
 
-const getKeys = (pg: PaymentGateway) => ({
+const getKeys = (pg: PayoutGateway) => ({
   PAYMENT_BASE_URL: decrypt(pg.base_url || ""),
   STATUS_URL: decrypt(pg.base_url_alt || ""),
   CLIENT_ID: decrypt(pg.client_id || ""),
@@ -21,7 +21,7 @@ const getKeys = (pg: PaymentGateway) => ({
 });
 
 const accountTransfer = async (
-  pg: PaymentGateway,
+  pg: PayoutGateway,
   data: Iserveu.PayoutRequest,
   requestId: requestId
 ): Promise<AccountTransferResponse> => {
@@ -84,7 +84,7 @@ const accountTransfer = async (
   }
 };
 
-const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: requestId) => {
+const getTransationStatus = async (pg: PayoutGateway, id: string, requestId: requestId) => {
   const transaction = await withdrawRepo.getTransactionByFilter({ pg_order_id: id });
 
   if (!transaction) throw new Error("Transaction not found");

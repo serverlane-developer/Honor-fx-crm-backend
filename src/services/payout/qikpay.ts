@@ -4,7 +4,7 @@ import logger from "../../utils/logger";
 
 import { requestId } from "../../@types/Common";
 import { AccountTransferResponse, QikPay } from "../../@types/Payout";
-import { PaymentGateway } from "../../@types/database";
+import { PayoutGateway } from "../../@types/database";
 import { decrypt } from "../../helpers/cipher";
 
 const ENDPOINTS = {
@@ -12,7 +12,7 @@ const ENDPOINTS = {
   STATUS: "/getStatus",
   BALANCE: "/getWalletBalance",
 };
-const getKeys = (pg: PaymentGateway) => ({
+const getKeys = (pg: PayoutGateway) => ({
   PAYMENT_BASE_URL: decrypt(pg.base_url || ""),
   API_TOKEN: decrypt(pg.merchant_id || ""),
   HKEY: decrypt(pg.secret_key || ""),
@@ -21,7 +21,7 @@ const getKeys = (pg: PaymentGateway) => ({
 const parsePgOrderId = (id = "") => id.replace(/-/g, "").slice(0, 30); // QikPay
 
 const accountTransfer = async (
-  pg: PaymentGateway,
+  pg: PayoutGateway,
   data: QikPay.PayoutRequest,
   requestId: requestId
 ): Promise<AccountTransferResponse> => {
@@ -107,7 +107,7 @@ const accountTransfer = async (
   }
 };
 
-const getBalance = async (pg: PaymentGateway, requestId: requestId) => {
+const getBalance = async (pg: PayoutGateway, requestId: requestId) => {
   try {
     const { API_TOKEN, PAYMENT_BASE_URL } = getKeys(pg);
     logger.info("Request to QikPay for Balance Check", { requestId });
@@ -129,7 +129,7 @@ const getBalance = async (pg: PaymentGateway, requestId: requestId) => {
   }
 };
 
-const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: requestId) => {
+const getTransationStatus = async (pg: PayoutGateway, id: string, requestId: requestId) => {
   try {
     const { API_TOKEN, PAYMENT_BASE_URL } = getKeys(pg);
 

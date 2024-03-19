@@ -1,6 +1,6 @@
 import { PAYOUT } from "../Payout";
 
-interface PaymentGateway {
+interface PayoutGateway {
   pg_id: string;
   pg_label: string;
   pg_service: PAYOUT;
@@ -30,4 +30,4 @@ interface PaymentGateway {
   is_deleted: boolean;
 }
 
-export default PaymentGateway;
+export default PayoutGateway;

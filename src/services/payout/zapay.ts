@@ -6,7 +6,7 @@ import { AccountTransferResponse, ZaPay } from "../../@types/Payout";
 import { requestId } from "../../@types/Common";
 import base64Helper from "../../helpers/base64";
 import hashHelper from "../../helpers/hash";
-import { PaymentGateway } from "../../@types/database";
+import { PayoutGateway } from "../../@types/database";
 import { decrypt } from "../../helpers/cipher";
 import * as pgTransactionRepo from "../../db_services/pg_transaction_repo";
 
@@ -16,7 +16,7 @@ const ENDPOINTS = {
   STATUS: "/TransferStatus",
   BALANCE: "/BalanceEnquiry",
 };
-const getKeys = (pg: PaymentGateway) => {
+const getKeys = (pg: PayoutGateway) => {
   const PAYMENT_BASE_URL = decrypt(pg.base_url || "");
   const MERCHANT_ID = decrypt(pg.merchant_id || "");
   const SECRET_KEY = decrypt(pg.secret_key || "");
@@ -33,7 +33,7 @@ const getKeys = (pg: PaymentGateway) => {
 const parsePgOrderId = (id: string) => id.replace(/-/g, "");
 
 const accountTransfer = async (
-  pg: PaymentGateway,
+  pg: PayoutGateway,
   data: ZaPay.PayoutRequest,
   requestId: requestId
 ): Promise<AccountTransferResponse> => {
@@ -138,7 +138,7 @@ const accountTransfer = async (
   }
 };
 
-const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: requestId) => {
+const getTransationStatus = async (pg: PayoutGateway, id: string, requestId: requestId) => {
   const { ENCODED_KEY, SECRET_KEY, PAYMENT_BASE_URL } = getKeys(pg);
   const url = PAYMENT_BASE_URL + ENDPOINTS.STATUS;
   const transaction = await pgTransactionRepo.getPgTransactionByFilter({ pg_order_id: id });
@@ -171,7 +171,7 @@ const getTransationStatus = async (pg: PaymentGateway, id: string, requestId: re
   return data.data;
 };
 
-const getBalance = async (pg: PaymentGateway, requestId: requestId) => {
+const getBalance = async (pg: PayoutGateway, requestId: requestId) => {
   try {
     const { ENCODED_KEY, PAYMENT_BASE_URL } = getKeys(pg);
     const url = PAYMENT_BASE_URL + ENDPOINTS.BALANCE;
