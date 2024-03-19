@@ -1,7 +1,7 @@
 import express from "express";
 
 import customerCtrl from "../../controllers/customer/auth";
-import auth from "../../middleware/auth";
+import auth from "../../middleware/customerAuth";
 
 const router = express.Router();
 

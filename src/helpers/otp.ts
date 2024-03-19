@@ -6,7 +6,7 @@ import logger from "../utils/logger";
 import helpers from "../helpers/helpers";
 import { OtpObject, otp_type } from "../@types/Otp";
 
-const canSendOTP = config.SEND_EMAIL;
+const { SEND_EMAIL, SEND_CUSTOMER_OTP } = config;
 
 const getOtpCacheKey = (key: string, otp_type: otp_type): string => `${key}_${otp_type}_otp`;
 
@@ -47,7 +47,7 @@ const sendOtp = (
   requestId: string | undefined,
   resend: boolean = false
 ): OtpObject => {
-  const isDevEnv = !canSendOTP;
+  const isDevEnv = !(otp_type === "customer_login" ? SEND_CUSTOMER_OTP : SEND_EMAIL);
 
   const otpCacheKey = getOtpCacheKey(email, otp_type);
 
@@ -87,7 +87,7 @@ const sendOtp = (
       resend,
     };
     if (config.LOG_OTP) {
-      logger.debug("ADMIN OTP", { email, otp_type, value, canSendOtp, requestId });
+      logger.debug("OTP", { email, otp_type, value, isDevEnv, requestId });
     }
     myCache.put(otpCacheKey, value, 1000 * 60 * config.OTP_EXPIRY_MINUTES);
     // if (canSendOTP) {

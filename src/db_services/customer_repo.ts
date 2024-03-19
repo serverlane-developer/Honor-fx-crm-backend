@@ -12,10 +12,10 @@ const tablename = "customer";
 
 export const createCustomer = async (
   object: Partial<Customer>,
-  customer_id: string = uuidv4(),
+  customer_id?: string,
   { trx }: trx = {}
 ): Promise<Customer | null> => {
-  object.customer_id = customer_id;
+  object.customer_id = customer_id || uuidv4();
   const query = (trx || knex)(tablename).returning("*").insert(object);
   const result = await query;
   return result?.[0] as unknown as Customer;

@@ -1,6 +1,6 @@
 import express from "express";
 
-import auth from "../../middleware/auth";
+import auth from "../../middleware/customerAuth";
 
 import authRouter from "./auth";
 import selfRouter from "./self";

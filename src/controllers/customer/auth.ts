@@ -1,6 +1,7 @@
 import { Response } from "express";
 import cache from "memory-cache";
 import * as libphonenumber from "libphonenumber-js";
+import { v4 as uuidv4 } from "uuid";
 
 import logger from "../../utils/logger";
 import { CustomerRequest, Request } from "../../@types/Express";
@@ -16,6 +17,7 @@ import { knex } from "../../data/knex";
 import { getCustomerJwtToken as getJwtToken } from "../../helpers/login";
 import smsHelper from "../../helpers/smsHelper";
 import { decrypt, encrypt } from "../../helpers/cipher";
+import config from "../../config";
 
 const getRegistrationTokenKey = (phone_number: string) => phone_number + "_register";
 
@@ -104,7 +106,7 @@ const sendOTP = async (req: Request, res: Response) => {
     }
 
     const { token } = otpHelper.sendOtp(phone_number, "customer_login", requestId);
-    await smsHelper.sendOTPSms(phone_number, token, requestId);
+    if (config.SEND_CUSTOMER_OTP) await smsHelper.sendOTPSms(phone_number, token, requestId);
 
     const message = "OTP Sent Successfully.";
 
@@ -199,6 +201,7 @@ const verifyOTP = async (req: Request, res: Response) => {
     const { timeRemaining, tooManyAttempts, lockedTill } = otpHelper.canSendOtp(phone_number, "customer_login", 3);
     if (tooManyAttempts) {
       const message = `Too Many Attempts try again after ${timeRemaining}.`;
+      logger.debug(message, { body, message, requestId });
       if (customer_id)
         await customerLoginLogRepo.addLoginRecord(
           {
@@ -227,6 +230,8 @@ const verifyOTP = async (req: Request, res: Response) => {
 
     if (!cachedOTP) {
       const message = `Invalid OTP. Retry Login.`;
+      logger.debug(message, { body, message, requestId });
+
       if (customer_id)
         await customerLoginLogRepo.addLoginRecord(
           {
@@ -255,6 +260,8 @@ const verifyOTP = async (req: Request, res: Response) => {
       if (tooManyAttempts) {
         otpHelper.clearOtp(phone_number, "customer_login");
         const message = `Too Many Attempts try again after ${timeRemaining}.`;
+        logger.debug(message, { body, message, requestId });
+
         if (customer_id)
           await customerLoginLogRepo.addLoginRecord(
             {
@@ -280,6 +287,7 @@ const verifyOTP = async (req: Request, res: Response) => {
       }
 
       const message = "OTP has expired or is invalid!";
+      logger.debug(message, { body, message, requestId });
       if (customer_id)
         await customerLoginLogRepo.addLoginRecord(
           {
@@ -309,6 +317,7 @@ const verifyOTP = async (req: Request, res: Response) => {
 
     if (!customerExists) {
       const message = "OTP Successfully Verified for New User";
+      logger.debug(message, { body, message, requestId });
       cache.put(getRegistrationTokenKey(phone_number), new Date().toISOString());
       return res.status(200).json({
         status: true,
@@ -400,7 +409,7 @@ const resendOTP = async (req: Request, res: Response) => {
     const isValid = libphonenumber.isValidPhoneNumber(phone_number || "");
     if (!isValid) {
       const message = `Invalid Phone Number.`;
-      logger.debug(message, { requestId, message });
+      logger.debug(message, { requestId, message, body });
       return res.status(400).json({
         status: false,
         message,
@@ -442,7 +451,7 @@ const resendOTP = async (req: Request, res: Response) => {
     otpHelper.resetFailedAttempt(phone_number, "customer_login");
 
     const { token } = otpHelper.sendOtp(phone_number, "customer_login", requestId);
-    await smsHelper.sendOTPSms(phone_number, token, requestId);
+    if (config.SEND_CUSTOMER_OTP) await smsHelper.sendOTPSms(phone_number, token, requestId);
 
     const message = "OTP Resent Successfully.";
 
@@ -516,7 +525,7 @@ const register = async (req: Request, res: Response) => {
     const isValid = libphonenumber.isValidPhoneNumber(phone_number);
     if (!isValid) {
       const message = `Invalid Phone Number.`;
-      logger.debug(message, { requestId, message });
+      logger.debug(message, { requestId, message, body });
       await trx.rollback();
 
       return res.status(400).json({
@@ -529,7 +538,7 @@ const register = async (req: Request, res: Response) => {
     const registrationToken = cache.get(getRegistrationTokenKey(phone_number));
     if (!registrationToken) {
       const message = `OTP Expired. Please try again.`;
-      logger.debug(message, { requestId, message });
+      logger.debug(message, { requestId, message, body });
       await trx.rollback();
 
       return res.status(400).json({
@@ -542,7 +551,7 @@ const register = async (req: Request, res: Response) => {
     const customerExists = await customerRepo.getCustomerByFilter({ phone_number });
     if (customerExists) {
       const message = `Profile already registered. Try to log in.`;
-      logger.debug(message, { requestId, message });
+      logger.debug(message, { requestId, message, body });
       await trx.rollback();
 
       return res.status(400).json({
@@ -554,6 +563,7 @@ const register = async (req: Request, res: Response) => {
       });
     }
 
+    const customer_id = uuidv4();
     const newCustomer = (await customerRepo.createCustomer(
       {
         phone_number,
@@ -564,7 +574,7 @@ const register = async (req: Request, res: Response) => {
         last_login_at: new Date().toISOString(),
         last_login_ip: ip,
       },
-      "",
+      customer_id,
       { trx }
     )) as Customer;
 
@@ -639,7 +649,7 @@ const verifyPin = async (req: Request, res: Response) => {
     const isValid = libphonenumber.isValidPhoneNumber(phone_number);
     if (!isValid) {
       const message = `Invalid Phone Number.`;
-      logger.debug(message, { requestId, message });
+      logger.debug(message, { requestId, message, body });
       await trx.rollback();
 
       return res.status(400).json({
@@ -652,7 +662,7 @@ const verifyPin = async (req: Request, res: Response) => {
     const customerExists = await customerRepo.getCustomerByFilter({ phone_number }, { trx });
     if (!customerExists) {
       const message = `Profile not found. Try to Register.`;
-      logger.debug(message, { requestId, message });
+      logger.debug(message, { requestId, message, body });
       await trx.rollback();
 
       return res.status(400).json({
@@ -668,7 +678,7 @@ const verifyPin = async (req: Request, res: Response) => {
 
     if (customerExists.is_pin_reset_required) {
       const message = `Too many failed attempts, Retry using OTP.`;
-      logger.debug(message, { requestId, message });
+      logger.debug(message, { requestId, message, body });
 
       await customerLoginLogRepo.addLoginRecord(
         {
@@ -841,7 +851,7 @@ const updatePin = async (req: CustomerRequest, res: Response) => {
     // const customerExists = await customerRepo.getCustomerByFilter({ customer_id }, { trx });
     // if (!customerExists) {
     //   const message = `Profile not found. Try to Register.`;
-    //   logger.debug(message, { requestId, message });
+    //   logger.debug(message, { requestId, message, body });
     //   await trx.rollback();
 
     //   return res.status(400).json({
