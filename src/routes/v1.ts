@@ -7,6 +7,7 @@ import moduleRoutes from "./modules";
 import roleRoutes from "./roles";
 import customerRoutes from "./customer";
 import paymentGatewayRoutes from "./payment_gateway"
+import transactionRoutes from "./transaction"
 
 
 const router = express.Router();
@@ -18,5 +19,8 @@ router.use("/paymentGateway", [auth], paymentGatewayRoutes);
 
 // customer
 router.use("/customer", customerRoutes);
+
+// payout
+router.use("/transaction", transactionRoutes)
 
 export default router;

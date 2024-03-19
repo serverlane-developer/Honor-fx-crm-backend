@@ -7,6 +7,7 @@ import accessControl from "./accessControl";
 import customer from "./customer";
 import paymentGateway from "./paymentGateway";
 import customerPaymentMethod from "./customerPaymentMethod";
+import withdraw from "./withdraw";
 
 export default {
   common,
@@ -18,4 +19,5 @@ export default {
   customer,
   paymentGateway,
   customerPaymentMethod,
+  withdraw,
 };
