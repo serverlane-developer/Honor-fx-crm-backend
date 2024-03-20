@@ -67,7 +67,7 @@ const createPayoutGateway = async (req: AdminRequest, res: Response) => {
       rtgs_max,
     };
 
-    const validator = validators.paymentGateway.pgValidation("new").validate(pgObject);
+    const validator = validators.payoutGateway.pgValidation("new").validate(pgObject);
     if (validator.error) {
       await trx.rollback();
       const message = validator.error.message;
@@ -189,7 +189,7 @@ const updatePayoutGateway = async (req: AdminRequest, res: Response) => {
       rtgs_max,
     };
 
-    const validator = validators.paymentGateway.pgValidation("old").validate({ ...pgObject, pg_id });
+    const validator = validators.payoutGateway.pgValidation("old").validate({ ...pgObject, pg_id });
     if (validator.error) {
       await trx.rollback();
       const message = validator.error.message;

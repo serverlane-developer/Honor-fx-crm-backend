@@ -6,12 +6,15 @@ interface PayoutGateway {
   pg_service: PAYIN;
   nickname: string;
 
-  base_url: string | null;
+  base_url: string;
   base_url_alt: string | null;
   merchant_id: string | null;
   secret_key: string | null;
   client_id: string | null;
   description: string | null;
+
+  username: string | null;
+  password: string | null;
 
   created_by: string;
   updated_by: string;

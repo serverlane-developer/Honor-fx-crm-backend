@@ -5,7 +5,7 @@ import module from "./module";
 import submodule from "./submodule";
 import accessControl from "./accessControl";
 import customer from "./customer";
-import paymentGateway from "./paymentGateway";
+import payoutGateway from "./payoutGateway";
 import customerPaymentMethod from "./customerPaymentMethod";
 import withdraw from "./withdraw";
 
@@ -17,7 +17,7 @@ export default {
   submodule,
   accessControl,
   customer,
-  paymentGateway,
+  payoutGateway,
   customerPaymentMethod,
   withdraw,
 };

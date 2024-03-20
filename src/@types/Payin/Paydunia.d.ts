@@ -15,7 +15,19 @@ interface TransactionRequest {
 }
 
 interface TransactionResponse {
-  CUST_NAME
+  CUST_NAME: string;
+  AMOUNT: string;
+  ORDER_ID: string;
+  PAY_ID: string;
+  TRANSACTION_ID: string;
+  STATUS: string;
+  "TEXT MESSAGE": string;
+  HASH: string;
+  RRN: string;
+  STATUS: string;
+  CUST_EMAIL: string;
+  CUST_PHONE: string;
+  RETURN_URL: string;
 }
 
 export { TransactionRequest };

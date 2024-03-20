@@ -15,6 +15,8 @@ export async function up(knex: Knex): Promise<void> {
     table.string("secret_key");
     table.string("client_id");
     table.string("description");
+    table.string("username");
+    table.string("password");
 
     table.string("created_by");
     table.string("updated_by");

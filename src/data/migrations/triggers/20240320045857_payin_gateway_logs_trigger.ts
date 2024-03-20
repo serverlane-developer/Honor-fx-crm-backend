@@ -16,6 +16,9 @@ const columns = [
   "client_id",
   "description",
 
+  "username",
+  "password",
+
   "created_by",
   "updated_by",
   "created_at",

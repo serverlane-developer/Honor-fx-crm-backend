@@ -17,6 +17,9 @@ export async function up(knex: Knex): Promise<void> {
     table.string("client_id").nullable();
     table.string("description").nullable().comment("For Internal admin reference");
 
+    table.string("username").nullable();
+    table.string("password").nullable();
+
     table.uuid("created_by").notNullable().references("user_id").inTable("admin_user").onDelete("restrict");
     table.uuid("updated_by").notNullable().references("user_id").inTable("admin_user").onDelete("restrict");
 
