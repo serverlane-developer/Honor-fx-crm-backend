@@ -13,6 +13,7 @@ import PgTransaction from "./PgTransaction";
 import CustomerPaymentMethod from "./CustomerPaymentMethod";
 import PayinGateway from "./PayinGateway";
 import Deposit from "./Deposit";
+import Mt5User from "./Mt5User";
 
 export {
   AdminUser,
@@ -29,4 +30,5 @@ export {
   CustomerPaymentMethod,
   PayinGateway,
   Deposit,
+  Mt5User,
 };

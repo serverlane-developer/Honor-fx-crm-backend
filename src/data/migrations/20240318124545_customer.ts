@@ -7,7 +7,7 @@ export async function up(knex: Knex): Promise<void> {
     table.uuid("customer_id").primary();
 
     // profile related
-    table.string("email").unique().nullable();
+    table.string("email").nullable();
     table.string("phone_number").unique().notNullable();
     table.string("username").nullable();
     table.boolean("is_image_uploaded").defaultTo(false);
