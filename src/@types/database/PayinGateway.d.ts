@@ -1,9 +1,9 @@
-import { PAYOUT } from "../Payout";
+import { PAYIN } from "../Payin";
 
 interface PayoutGateway {
   pg_id: string;
   pg_label: string;
-  pg_service: PAYOUT;
+  pg_service: PAYIN;
   nickname: string;
 
   base_url: string | null;

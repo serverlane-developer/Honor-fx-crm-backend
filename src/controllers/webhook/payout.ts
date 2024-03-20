@@ -3,7 +3,7 @@ import { Request } from "../../@types/Express";
 import logger from "../../utils/logger";
 
 import { PayoutServices, payoutHelper } from "../../services/payout";
-// import ismartpayService from "../../services/payout/ismartpay";
+// import ismartpayService from "../../../services/payout/ismartpay";
 import zapayService from "../../services/payout/zapay";
 
 import * as transanctionRepo from "../../db_services/withdraw_repo";

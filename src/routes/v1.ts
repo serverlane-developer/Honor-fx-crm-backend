@@ -6,9 +6,8 @@ import adminRoutes from "./admin";
 import moduleRoutes from "./modules";
 import roleRoutes from "./roles";
 import customerRoutes from "./customer";
-import paymentGatewayRoutes from "./payment_gateway"
-import transactionRoutes from "./transaction"
-
+import paymentGatewayRoutes from "./payment_gateway";
+import webhookRoutes from "./webhook";
 
 const router = express.Router();
 
@@ -21,6 +20,6 @@ router.use("/paymentGateway", [auth], paymentGatewayRoutes);
 router.use("/customer", customerRoutes);
 
 // payout
-router.use("/transaction", transactionRoutes)
+router.use("/webhook", webhookRoutes);
 
 export default router;
