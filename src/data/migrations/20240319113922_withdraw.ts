@@ -33,6 +33,10 @@ export async function up(knex: Knex): Promise<void> {
       .onDelete("restrict")
       .comment("Created By User");
     table.uuid("mt5_user_id").notNullable().references("mt5_user_id").inTable("mt5_user").onDelete("restrict");
+    table.string("dealid").notNullable();
+    table.string("margin").nullable();
+    table.string("freemargin").nullable();
+    table.string("equity").nullable();
     table
       .uuid("updated_by")
       .notNullable()

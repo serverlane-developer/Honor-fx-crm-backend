@@ -26,6 +26,10 @@ interface Withdraw {
   payment_method_id: string;
   customer_id: string;
   mt5_user_id: string;
+  dealid: string;
+  margin: string;
+  freemargin: string;
+  equity: string;
   updated_by: string;
   created_at: string;
   updated_at: string;

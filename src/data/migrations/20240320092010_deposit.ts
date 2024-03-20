@@ -64,7 +64,7 @@ export async function up(knex: Knex): Promise<void> {
       .comment("uuid created to check transaction status on payment gateway.");
 
     // MT5 related fields
-    table.string("dealid").nullable();
+    table.string("dealid").notNullable();
     table.string("margin").nullable();
     table.string("freemargin").nullable();
     table.string("equity").nullable();
