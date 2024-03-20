@@ -43,8 +43,20 @@ const register = async (client_name: string, email: string, requestId: requestId
 
     return data;
   } catch (err) {
-    logger.error(`Error while registering user on mt5 paydunia payout api`, { err, requestId, body });
-    throw err;
+    let message = "Error while registering user on mt5";
+    logger.error(message, { err, requestId, body });
+    if (axios.isAxiosError(err)) {
+      message = err.response?.data;
+    } else if (err instanceof Error) {
+      message = err.message;
+    }
+    return {
+      message,
+      status: false,
+      data: null,
+      error: true,
+      result: null
+    };
   }
 };
 
@@ -70,8 +82,21 @@ const deposit = async (mt5_id: string, amount: string, requestId: requestId) => 
 
     return data;
   } catch (err) {
-    logger.error(`Error while depositing  on mt5 paydunia payout api`, { err, requestId, body });
-    throw err;
+    let message = "Error while depositing on mt5";
+    logger.error(message, { err, requestId, body });
+    if (axios.isAxiosError(err)) {
+      message = err.response?.data;
+    } else if (err instanceof Error) {
+      message = err.message;
+    }
+    return {
+      message,
+      status: false,
+      data: null,
+      error: true,
+      result: null
+
+    };
   }
 };
 
@@ -97,8 +122,20 @@ const withdraw = async (mt5_id: string, amount: string, requestId: requestId) =>
 
     return data;
   } catch (err) {
-    logger.error(`Error while withdrawing on mt5 paydunia payout api`, { err, requestId, body });
-    throw err;
+    let message = "Error while withdrawing on mt5";
+    logger.error(message, { err, requestId, body });
+    if (axios.isAxiosError(err)) {
+      message = err.response?.data;
+    } else if (err instanceof Error) {
+      message = err.message;
+    }
+    return {
+      message,
+      status: false,
+      data: null,
+      error: true,
+      result: null
+    };
   }
 };
 

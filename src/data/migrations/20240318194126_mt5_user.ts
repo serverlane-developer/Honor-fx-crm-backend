@@ -5,6 +5,7 @@ const TABLE_NAME = "mt5_user";
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable(TABLE_NAME, (table) => {
     table.uuid("mt5_user_id").primary();
+    table.string("status").notNullable();
 
     // profile related
     table.string("email").nullable();

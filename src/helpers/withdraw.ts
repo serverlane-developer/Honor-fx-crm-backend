@@ -13,9 +13,11 @@ import * as pgRepo from "../db_services/payout_gateway_repo";
 import * as pgTransactionsRepo from "../db_services/pg_transaction_repo";
 import * as customerRepo from "../db_services/customer_repo";
 import * as paymentMethodRepo from "../db_services/customer_payment_method_repo";
+import mt5 from "../services/mt5";
+import { Mt5User } from "../@types/database";
 import { getPaymentMethod } from "./paymentMethodHelper";
 
-const addTransactionOnMt5 = async (transaction_id: string, requestId: requestId) => {
+const addTransactionOnMt5 = async (transaction_id: string, mt5_user: Mt5User, requestId: requestId) => {
   const trx = await knex.transaction();
   logger.debug("Adding Transaction on Mt5 Server", { requestId, transaction_id });
   try {
@@ -24,13 +26,37 @@ const addTransactionOnMt5 = async (transaction_id: string, requestId: requestId)
       await trx.rollback();
       return { status: false, message: "Transaction not Found", data: null };
     }
-    // TODO: MT5 Server Withdraw Request
-    const response = {
-      status: "SUCCESS",
-      message: "Transaction was Successful",
-    };
+    const response = await mt5.api.withdraw(mt5_user.mt5_id, transaction.amount, requestId);
+    if (!response.status || !response.result) {
+      await withdrawRepo.updateTransaction(
+        { transaction_id },
+        {
+          status: Status.FAILED,
+          mt5_status: Status.FAILED,
+          mt5_message: response.message,
+        },
+        { trx }
+      );
+      return { status: false, data: response, message: "Failed to withdraw from Mt5" };
+    }
 
-    // TODO: UPDATE TRANSACTION STATUS
+    const { dealid, equity, freemargin, margin } = response.result;
+    await withdrawRepo.updateTransaction(
+      { transaction_id },
+      {
+        dealid: String(dealid),
+        equity: String(equity),
+        freemargin: String(freemargin),
+        margin: String(margin),
+        status: Status.PROCESSING,
+        mt5_status: Status.SUCCESS,
+        mt5_message: response.message,
+        payout_status: Status.PENDING,
+      },
+      { trx }
+    );
+
+    await trx.commit();
     return { status: true, data: response, message: "Added Transaction on MT5 Server" };
   } catch (err) {
     await trx.rollback();

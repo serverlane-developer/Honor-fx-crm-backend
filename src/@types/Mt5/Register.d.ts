@@ -9,7 +9,7 @@ interface RegisterResponse {
   status: boolean;
   statusCode: number;
   message: string;
-  result?: {
+  result: null | {
     mt5_id: number;
     master_password: string;
     investor_password: string;

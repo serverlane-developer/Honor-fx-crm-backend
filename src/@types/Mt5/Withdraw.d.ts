@@ -7,7 +7,7 @@ interface WithdrawResponse {
   status: boolean;
   statusCode: number;
   message: string;
-  result?: {
+  result: null | {
     mt5_id: number;
     dealid: number;
     withdrawn_amount: string;

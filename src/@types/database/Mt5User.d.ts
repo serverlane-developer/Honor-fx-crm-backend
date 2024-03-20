@@ -1,6 +1,8 @@
+import { Status } from "../Common";
+
 interface Mt5User {
   mt5_user_id: string;
-
+  status: Status.PENDING | Status.FAILED | Status.SUCCESS;
   // profile
   client_name: string;
   email: string | null;

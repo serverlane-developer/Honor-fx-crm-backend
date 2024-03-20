@@ -1,5 +1,5 @@
 import { v4 } from "uuid";
-import { ReturnResponse, requestId } from "../@types/Common";
+import { ReturnResponse, Status, requestId } from "../@types/Common";
 import { Customer, Mt5User } from "../@types/database";
 import { knex } from "../data/knex";
 import mt5 from "../services/mt5";
@@ -29,7 +29,6 @@ const createUserOnMt5 = async (
     }
 
     const response = await mt5.api.register(client_name, email, requestId);
-    const message = "Successfully created user on Mt5";
 
     if (!response.status || !response.result) {
       await trx.rollback();
@@ -41,6 +40,8 @@ const createUserOnMt5 = async (
         data: null,
       };
     }
+    const message = "Successfully created user on Mt5";
+
     const { country, investor_password, leverage, master_password, mt5_id, mt_group } = response.result;
     const mt5_user_id = v4();
     const newUser: Partial<Mt5User> = {
@@ -54,6 +55,7 @@ const createUserOnMt5 = async (
       master_password,
       mt5_id: mt5_id.toString(),
       mt_group,
+      status: Status.SUCCESS,
     };
     await mt5UserRepo.createMt5User(newUser, mt5_user_id, { trx });
     await trx.commit();

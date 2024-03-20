@@ -13,7 +13,6 @@ import validators from "../../../validators";
 import { knex } from "../../../data/knex";
 import { Withdraw } from "../../../@types/database";
 import helpers from "../../../helpers/helpers";
-import withdrawHelper from "../../../helpers/withdraw";
 import { Status } from "../../../@types/database/Withdraw";
 
 const createWithdraw = async (req: CustomerRequest, res: Response) => {
@@ -137,20 +136,20 @@ const createWithdraw = async (req: CustomerRequest, res: Response) => {
     await withdrawRepo.createTransaction(transaction, transaction_id, { trx });
     await trx.commit();
 
-    const mt5Result = await withdrawHelper.addTransactionOnMt5(transaction_id, requestId);
-    if (!mt5Result.status) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Error Withdraw from MT5", data: { transaction, mt5Result } });
-    }
-    const payoutResult = await withdrawHelper.addTransactionOnGateway(transaction_id, requestId);
-    if (!payoutResult.status) {
-      return res.status(400).json({
-        status: false,
-        message: "Withdraw Successful form MT5 but error on payout",
-        data: { transaction, mt5Result, payoutResult },
-      });
-    }
+    // const mt5Result = await withdrawHelper.addTransactionOnMt5(transaction_id, requestId);
+    // if (!mt5Result.status) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: false, message: "Error Withdraw from MT5", data: { transaction, mt5Result } });
+    // }
+    // const payoutResult = await withdrawHelper.addTransactionOnGateway(transaction_id, requestId);
+    // if (!payoutResult.status) {
+    //   return res.status(400).json({
+    //     status: false,
+    //     message: "Withdraw Successful form MT5 but error on payout",
+    //     data: { transaction, mt5Result, payoutResult },
+    //   });
+    // }
 
     return res.status(200).json({ status: true, message: "Withdraw Created.", data: transaction });
   } catch (err) {

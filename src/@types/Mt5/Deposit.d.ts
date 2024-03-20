@@ -7,7 +7,7 @@ interface DepositResponse {
   status: boolean;
   statusCode: number;
   message: string;
-  result?: {
+  result: null | {
     mt5_id: number;
     dealid: number;
     deposited_amount: string;

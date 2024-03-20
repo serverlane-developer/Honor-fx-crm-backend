@@ -5,6 +5,7 @@ const LOG_TABLE_NAME = `${TABLE_NAME}_logs`;
 
 const columns = [
   "mt5_user_id",
+  "status",
   "email",
   "phone_number",
   "client_name",

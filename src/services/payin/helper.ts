@@ -9,6 +9,7 @@ import logger from "../../utils/logger";
 
 import * as depositRepo from "../../db_services/deposit_repo";
 import config from "../../config";
+import depositHelper from "../../helpers/deposit";
 import { PayinServices } from ".";
 
 const createPayinData = (
@@ -80,6 +81,8 @@ const updatePayinStatus = async (
   PAYIN_GATEWAY: PAYIN
 ) => {
   // INITIAL PAYMENT OBJECT
+  let mt5_user_id;
+
   const paymentObj = {
     pg_order_id: "",
     status: "",
@@ -120,6 +123,7 @@ const updatePayinStatus = async (
     }
 
     const txnStatus = paymentStatus.toLowerCase();
+    mt5_user_id = transactionExists.mt5_user_id;
 
     paymentObj.status = txnStatus;
     paymentObj.pg_order_id = id;
@@ -182,8 +186,8 @@ const updatePayinStatus = async (
     resObj.data = updatedTxn;
   }
 
-  if (transaction_id && txnStatus === Status.SUCCESS) {
-    // TODO: SEND DEPOSIT TASK TO MT5
+  if (transaction_id && txnStatus === Status.SUCCESS && mt5_user_id) {
+    await depositHelper.addTransactionOnMt5(transaction_id, mt5_user_id, requestId);
   }
 
   return resObj;

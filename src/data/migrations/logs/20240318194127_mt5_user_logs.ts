@@ -5,6 +5,7 @@ const TABLE_NAME = "mt5_user_logs";
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable(TABLE_NAME, (table) => {
     table.string("mt5_user_id");
+    table.string("status");
     table.string("email");
     table.string("phone_number");
     table.string("client_name");
