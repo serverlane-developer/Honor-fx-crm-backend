@@ -60,6 +60,9 @@ const envVarsSchema = joi
     SMS_ROUTE: joi.string().optional(),
     SMS_MESSAGE: joi.string().optional(),
     SMS_KEYWORD: joi.string().optional(),
+
+    MT5_LEVERAGE: joi.string().required(),
+    MT5_COUNTRY: joi.string().required(),
   })
   .unknown()
   .when(joi.object({ NODE_ENV: "production" }).unknown(), {
@@ -160,6 +163,9 @@ const config = {
   SMS_ROUTE: envVars.SMS_ROUTE as string,
   SMS_MESSAGE: (envVars.SMS_MESSAGE || "Your OTP for mobile verification is %otp% IBITOT") as string,
   SMS_KEYWORD: (envVars.SMS_KEYWORD || "%otp%") as string,
+
+  MT5_COUNTRY: envVars.MT5_COUNTRY as string,
+  MT5_LEVERAGE: envVars.MT5_LEVERAGE as string,
 };
 
 export default config;
