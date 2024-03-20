@@ -17,17 +17,17 @@ const createUserOnMt5 = async (
   const trx = await knex.transaction();
   try {
     const { customer_id } = customer;
-    const exists = await mt5UserRepo.getMt5UserByFilter({ client_name: client_name }, { trx });
-    if (exists) {
-      await trx.rollback();
-      const message = "User with a similar username already exists";
-      logger.debug(message, { requestId, client_name, email });
-      return {
-        status: false,
-        message,
-        data: null,
-      };
-    }
+    // const exists = await mt5UserRepo.getMt5UserByFilter({ client_name: client_name }, { trx });
+    // if (exists) {
+    //   await trx.rollback();
+    //   const message = "User with a similar username already exists";
+    //   logger.debug(message, { requestId, client_name, email });
+    //   return {
+    //     status: false,
+    //     message,
+    //     data: null,
+    //   };
+    // }
 
     const response = await mt5.api.register(client_name, email, requestId);
 
