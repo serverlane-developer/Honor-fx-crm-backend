@@ -40,7 +40,7 @@ export const getAllMt5Users = async ({
   let query = knexRead(`${tablename} as m`)
     .select(columns)
     .join("customer as cb", "m.customer_id", "cb.mt5_user_id")
-    .leftJoin("admin_user as ub", "m.updated_by", "ub.mt5_user_id")
+    .leftJoin("admin_user as ub", "m.updated_by", "ub.user_id")
     .orderBy("m.updated_at", "desc");
 
   if (limit) query = query.limit(limit).offset(skip || 0);
