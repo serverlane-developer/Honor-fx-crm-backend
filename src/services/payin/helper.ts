@@ -11,7 +11,7 @@ import * as depositRepo from "../../db_services/deposit_repo";
 import config from "../../config";
 import { PayinServices } from ".";
 
-const createPayinData = async (
+const createPayinData = (
   pg_order_id: string,
   transaction: Partial<Deposit>,
   customer: Customer,
@@ -24,8 +24,6 @@ const createPayinData = async (
   const email = customer.email || `${customer.username}@test.com`;
   const { username } = customer;
 
-  const orderId = await depositRepo.getUniqueOrderId();
-
   const RETURN_URL = config.PAYIN_RETURN_URL;
 
   const PAY_ID = PayinServices[pg.pg_service].getKeys(pg).MERCHANT_ID;
@@ -36,7 +34,7 @@ const createPayinData = async (
     CUST_EMAIL: email,
     CUST_NAME: username,
     CUST_PHONE: Number(phone),
-    ORDER_ID: orderId as string,
+    ORDER_ID: pg_order_id,
     PAY_ID: Number(PAY_ID),
     RETURN_URL,
   };
@@ -182,6 +180,10 @@ const updatePayinStatus = async (
     );
     resObj.message = `Transaction Status has been updated to ${txnStatus}`;
     resObj.data = updatedTxn;
+  }
+
+  if (transaction_id && txnStatus === Status.SUCCESS) {
+    // TODO: SEND DEPOSIT TASK TO MT5
   }
 
   return resObj;

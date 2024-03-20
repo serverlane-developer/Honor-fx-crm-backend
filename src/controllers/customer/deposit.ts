@@ -13,6 +13,7 @@ import { knex } from "../../data/knex";
 import { Deposit } from "../../@types/database";
 import helpers from "../../helpers/helpers";
 import { Status } from "../../@types/database/Deposit";
+import { PayinServices, payinHelper } from "../../services/payin";
 
 const createDeposit = async (req: CustomerRequest, res: Response) => {
   const { customer_id, requestId, customer, body } = req;
@@ -81,6 +82,17 @@ const createDeposit = async (req: CustomerRequest, res: Response) => {
       });
     }
 
+    const pg_order_id = await depositRepo.getUniqueOrderId();
+    if (!pg_order_id) {
+      const message = "Error while generating Pg Order ID";
+      logger.debug(message, { message, requestId });
+      await trx.rollback();
+      return res.status(400).json({
+        status: false,
+        message,
+        data: null,
+      });
+    }
     const transaction_id = v4();
     const transaction: Partial<Deposit> = {
       amount,
@@ -92,14 +104,31 @@ const createDeposit = async (req: CustomerRequest, res: Response) => {
       payin_status: Status.PENDING,
       pg_id,
       mt5_user_id,
+      pg_order_id,
     };
+
+    const { pg_service } = pg;
+
+    const paymentData = payinHelper.createPayinData(pg_order_id, transaction, customer, pg, requestId);
+    if (!paymentData) {
+      const message = "Unable to create Payment Data to initate transaction on Gateway";
+      logger.debug(message, { message, requestId, amount });
+      await trx.rollback();
+      return {
+        status: false,
+        message,
+        data: null,
+      };
+    }
+
+    const url = await PayinServices[pg_service].getUrl(pg, paymentData, requestId);
 
     await depositRepo.createTransaction(transaction, transaction_id, { trx });
     await trx.commit();
 
-    return res.status(200).json({ status: true, message: "Deposit Created.", data: transaction });
+    return res.status(200).json({ status: true, message: "Deposit Created.", data: { url } });
   } catch (err) {
-    if (!trx.isCompleted()) await trx.rollback();
+    await trx.rollback();
     const message = "Error while creating deposit";
     logger.error(message, { err, customer_id, requestId, body });
     return res.status(500).json({ status: false, message, data: null });
