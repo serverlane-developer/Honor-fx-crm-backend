@@ -11,6 +11,7 @@ import PayoutGateway from "./PayoutGateway";
 import Withdraw from "./Withdraw";
 import PgTransaction from "./PgTransaction";
 import CustomerPaymentMethod from "./CustomerPaymentMethod";
+import PayinGateway from "./PayinGateway";
 
 export {
   AdminUser,
@@ -24,5 +25,6 @@ export {
   PayoutGateway,
   Withdraw,
   PgTransaction,
-  CustomerPaymentMethod
+  CustomerPaymentMethod,
+  PayinGateway,
 };
