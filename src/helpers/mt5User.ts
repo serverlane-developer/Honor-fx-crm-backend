@@ -6,6 +6,7 @@ import mt5 from "../services/mt5";
 import logger from "../utils/logger";
 
 import * as mt5UserRepo from "../db_services/mt5_user_repo";
+import { encrypt } from "./cipher";
 
 const createUserOnMt5 = async (
   client_name: string,
@@ -50,9 +51,9 @@ const createUserOnMt5 = async (
       country,
       customer_id,
       email,
-      investor_password,
       leverage,
-      master_password,
+      master_password: encrypt(master_password),
+      investor_password: encrypt(investor_password),
       mt5_id: mt5_id.toString(),
       mt_group,
       status: Status.SUCCESS,

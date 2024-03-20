@@ -91,7 +91,6 @@ export async function up(knex: Knex): Promise<void> {
       .nullable()
       .defaultTo(null)
       .comment("uuid created to check transaction status on payment gateway.");
-    // TODO: MT5 related fields
   });
   await knex.raw(`
   CREATE TRIGGER update_timestamp

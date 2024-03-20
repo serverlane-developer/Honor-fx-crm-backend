@@ -36,12 +36,12 @@ export const getAllMt5Users = async ({
     const countQuery = knexRead(tablename).select(knexRead.raw("count(mt5_user_id) as count")).first();
     return countQuery;
   }
-  const columns = ["c.*", "cb.username as created_by", "ub.username as updated_by"];
-  let query = knexRead(`${tablename} as c`)
+  const columns = ["m.*", "cb.username as created_by", "ub.username as updated_by"];
+  let query = knexRead(`${tablename} as m`)
     .select(columns)
-    .leftJoin("customer as cb", "c.customer_id", "cb.mt5_user_id")
-    .leftJoin("admin_user as ub", "c.updated_by", "ub.mt5_user_id")
-    .orderBy("c.updated_at", "desc");
+    .join("customer as cb", "m.customer_id", "cb.mt5_user_id")
+    .leftJoin("admin_user as ub", "m.updated_by", "ub.mt5_user_id")
+    .orderBy("m.updated_at", "desc");
 
   if (limit) query = query.limit(limit).offset(skip || 0);
   // console.log(query.toString());

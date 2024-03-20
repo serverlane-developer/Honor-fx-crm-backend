@@ -220,7 +220,6 @@ const verifyToken = async (pg: PayoutGateway, token: string, requestId: requestI
     const result = await axios(config);
     logger.info(`successfully fetched cashfree api verify token response`, { requestId });
     const data = result?.data;
-    // TODO: add response type
 
     const isValid = data?.subCode === "200" && data?.status === "SUCCESS";
     return isValid;
