@@ -6,4 +6,7 @@ const router = express.Router();
 
 router.post("/", customerCtrl.createWithdraw);
 
+router.get("/:status", customerCtrl.getWithdrawList);
+router.get("/", customerCtrl.getWithdrawList);
+
 export default router;

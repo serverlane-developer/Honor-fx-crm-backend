@@ -6,4 +6,7 @@ const router = express.Router();
 
 router.post("/", customerCtrl.createDeposit);
 
+router.get("/:status", customerCtrl.getDepositList);
+router.get("/", customerCtrl.getDepositList);
+
 export default router;

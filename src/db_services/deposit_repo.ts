@@ -162,3 +162,83 @@ export const getUniqueOrderId = async (retry = 0): Promise<string | undefined> =
   if (retry > 10) throw new Error("Unable to generate Unique Order ID for Payin");
   if (idExists) return getUniqueOrderId(retry + 1);
 };
+
+export const getCustomerTransactions = async ({
+  limit,
+  skip,
+  totalRecords = false,
+  status = null,
+  order = "updated_at",
+  dir,
+  customer_id,
+  mt5_user_id,
+  from_date,
+  to_date,
+}: PaginationParams): Promise<Partial<Deposit>[] | count> => {
+  const filter = {
+    "t.customer_id": customer_id,
+    ...(status && { "t.status": status }),
+    ...(mt5_user_id && { "t.mt5_user_id": mt5_user_id }),
+  };
+
+  if (totalRecords) {
+    const countQuery = knexRead(`${tablename} as t`)
+      .select(knexRead.raw("count(t.transaction_id) as count"))
+      .where(filter)
+      .first();
+
+    return countQuery;
+  }
+
+  const showPgColumns = ![Status.PROCESSING, Status.FAILED].includes(status);
+  const columns = [
+    "t.transaction_id",
+    "t.amount",
+    "t.transaction_type",
+
+    "t.status",
+    "t.payin_status",
+    "t.mt5_status",
+    "t.payin_message",
+    "t.mt5_message",
+    "t.admin_message",
+
+    "t.api_error",
+    "t.created_at",
+    "t.updated_at",
+    "t.is_deleted",
+    "t.pg_task",
+    "t.dealid",
+    "t.margin",
+    "t.freemargin",
+    "t.equity",
+
+    // customer
+    "c.phone_number",
+    "c.username",
+  ];
+  if (showPgColumns) {
+    columns.push("t.pg_order_id");
+    columns.push("t.payment_status");
+    columns.push("t.utr_id");
+    columns.push("t.payment_order_id");
+
+    // payment gateway
+    columns.push("pg.pg_label");
+  }
+
+  let query = knexRead(`${tablename} as t`)
+    .select(columns)
+    .where(filter)
+    .join("customer as c", "t.customer_id", "c.customer_id")
+    .join("payin_gateway as pg", "t.pg_id", "pg.pg_id")
+    .orderBy(`t.${order}`, dir);
+
+  if (from_date && to_date) {
+    query = query.whereBetween("t.created_at", [from_date, to_date]);
+  }
+
+  if (limit) query = query.limit(limit).offset(skip || 0);
+  // console.log(query.toString());
+  return query;
+};
