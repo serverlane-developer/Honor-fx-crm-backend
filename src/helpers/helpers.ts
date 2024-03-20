@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { Request } from "express";
 import useragent from "express-useragent";
 import config from "../config";
@@ -51,6 +52,8 @@ const getRandomMobileNumber = () => {
   return str.toString();
 };
 
+const getRandomId = (length = 16) => crypto.randomBytes((length && length > 2 ? length : 2) / 2).toString("hex");
+
 export default {
   getResetTokenKey,
   getAdminResetPasswordURL,
@@ -59,4 +62,5 @@ export default {
   getDeviceDetails,
   parseDeviceDetails,
   getRandomMobileNumber,
+  getRandomId,
 };

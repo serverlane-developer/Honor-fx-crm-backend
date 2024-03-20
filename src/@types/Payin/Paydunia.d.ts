@@ -12,7 +12,7 @@ interface PayinRequest {
   PAY_ID: number;
   ORDER_ID: string;
   RETURN_URL: string;
-  HASH: string;
+  HASH?: string;
 
   // CUSTOMER DETAILS
   CUST_NAME: string;

@@ -8,11 +8,11 @@ interface Deposit {
   // fields to track transaction
   status: transaction_status;
   mt5_status: mt5_status;
-  payout_status: transaction_status;
+  payin_status: transaction_status;
 
   admin_message: string | null;
   mt5_message: string | null;
-  payout_message: string | null;
+  payin_message: string | null;
   api_error: string | null;
 
   ip: string | null;

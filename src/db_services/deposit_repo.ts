@@ -8,6 +8,7 @@ import { knex, knexRead } from "../data/knex";
 
 import { PaginationParams } from "../@types/Common";
 import { Status } from "../@types/database/Deposit";
+import helpers from "../helpers/helpers";
 
 const tablename = "deposit";
 
@@ -119,7 +120,6 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
     "t.status",
     "t.message",
 
-
     // logs
     "t.created_on as updated_at",
   ];
@@ -153,4 +153,12 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
   if (limit) query = query.limit(limit).offset(skip || 0);
   // console.log(query.toString());
   return query;
+};
+
+export const getUniqueOrderId = async (retry = 0): Promise<string | undefined> => {
+  const id = helpers.getRandomId();
+  const idExists = await knexRead("deposit").select("transaction_id").where({ pg_order_id: id }).first();
+  if (!idExists) return id;
+  if (retry > 10) throw new Error("Unable to generate Unique Order ID for Payin");
+  if (idExists) return getUniqueOrderId(retry + 1);
 };

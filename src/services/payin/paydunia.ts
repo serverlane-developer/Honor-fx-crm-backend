@@ -103,8 +103,7 @@ const getTransationStatus = async (pg: PayinGateway, orderid: string, requestId:
 
   logger.info(`Transaction status for ID: ${orderid} | RESPONSE`, { data, requestId });
   const result = data as Paydunia.StatusResponse;
-  const status = result?.statement?.status || "error";
-  return { status, ...result?.statement };
+  return result;
 };
 
 // authenticate before each network call

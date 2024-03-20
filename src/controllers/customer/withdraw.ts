@@ -7,6 +7,7 @@ import { CustomerRequest } from "../../@types/Express";
 import * as paymentMethodRepo from "../../db_services/customer_payment_method_repo";
 import * as withdrawRepo from "../../db_services/withdraw_repo";
 import * as pgRepo from "../../db_services/payout_gateway_repo";
+import * as mt5UserRepo from "../../db_services/mt5_user_repo";
 
 import validators from "../../validators";
 import { knex } from "../../data/knex";
@@ -20,7 +21,7 @@ const createWithdraw = async (req: CustomerRequest, res: Response) => {
   const ip = helpers.getIp(req);
   const trx = await knex.transaction();
   try {
-    const { amount, payment_method_id, pg_id } = body;
+    const { amount, payment_method_id, pg_id, mt5_user_id } = body;
 
     if (!customer_id || !customer) {
       await trx.rollback();
@@ -35,11 +36,35 @@ const createWithdraw = async (req: CustomerRequest, res: Response) => {
       payment_method_id,
       customer_id,
       pg_id,
+      mt5_user_id,
     });
     if (validator.error) {
       await trx.rollback();
       const message = validator.error.message;
       logger.debug("Validation error while creating withdraw", { body, message, requestId });
+      return res.status(400).json({
+        status: false,
+        message,
+        data: null,
+      });
+    }
+
+    const mt5User = await mt5UserRepo.getMt5UserById(mt5_user_id);
+    if (!mt5User) {
+      await trx.rollback();
+      const message = "MT5 User not found";
+      logger.debug(message, { body, message, requestId });
+      return res.status(400).json({
+        status: false,
+        message,
+        data: null,
+      });
+    }
+
+    if (mt5User.customer_id !== customer_id) {
+      await trx.rollback();
+      const message = "MT5 User not found";
+      logger.debug(message, { body, message, requestId });
       return res.status(400).json({
         status: false,
         message,
@@ -106,6 +131,7 @@ const createWithdraw = async (req: CustomerRequest, res: Response) => {
       payout_message: Status.PENDING,
       pg_id,
       payment_method_id,
+      mt5_user_id,
     };
 
     await withdrawRepo.createTransaction(transaction, transaction_id, { trx });

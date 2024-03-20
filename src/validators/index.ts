@@ -8,6 +8,7 @@ import customer from "./customer";
 import payoutGateway from "./payoutGateway";
 import customerPaymentMethod from "./customerPaymentMethod";
 import withdraw from "./withdraw";
+import deposit from "./deposit";
 
 export default {
   common,
@@ -20,4 +21,5 @@ export default {
   payoutGateway,
   customerPaymentMethod,
   withdraw,
+  deposit,
 };

@@ -34,6 +34,7 @@ const envVarsSchema = joi
 
     BASE_URL: joi.string().uri().required(),
     BACKOFFICE_BASE_URL: joi.string().uri().required(),
+    PAYIN_RETURN_URL: joi.string().uri().required(),
 
     OTP_VERIFICATION_LOCK_MINUTES: joi.number().positive().optional().allow(""),
     OTP_EXPIRY_MINUTES: joi.number().positive().optional().allow(""),
@@ -127,6 +128,7 @@ const config = {
   // URL
   BASE_URL: envVars.BASE_URL as string,
   BACKOFFICE_BASE_URL: envVars.BACKOFFICE_BASE_URL as string,
+  PAYIN_RETURN_URL: envVars.BACKOFFICE_BASE_URL as string,
 
   // OTP
   OTP_VERIFICATION_LOCK_MINUTES: Number(envVars.OTP_VERIFICATION_LOCK_MINUTES || 0) || 5,
