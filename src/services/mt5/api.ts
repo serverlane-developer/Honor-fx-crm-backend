@@ -39,7 +39,7 @@ const register = async (client_name: string, email: string, requestId: requestId
     const result = await axios(config);
     const data = result.data as RegisterResponse;
 
-    logger.info(`successfully registered user on mt5`, { requestId, result });
+    logger.info(`successfully registered user on mt5`, { requestId, data });
 
     return data;
   } catch (err) {
