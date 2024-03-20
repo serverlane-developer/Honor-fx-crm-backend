@@ -6,4 +6,14 @@ const enum PAYIN_SERVICE {
 
 type PAYIN = keyof typeof PAYIN_SERVICE;
 
-export { PAYIN, PAYIN_SERVICE, Paydunia };
+type PayinResponse = {
+  status: boolean;
+  url: string;
+  message: string;
+  data: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  } | null;
+};
+
+export { PAYIN, PAYIN_SERVICE, Paydunia, PayinResponse };
