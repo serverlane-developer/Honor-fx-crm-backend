@@ -16,6 +16,7 @@ const columns = [
   "api_error",
   "ip",
   "customer_id",
+  "mt5_user_id",
   "updated_by",
   "pg_id",
   "payment_status",

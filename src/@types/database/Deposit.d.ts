@@ -1,6 +1,5 @@
 import { Status, mt5_status, transaction_status } from "../Common";
 
-
 interface Deposit {
   transaction_id: string;
   amount: string;
@@ -18,6 +17,8 @@ interface Deposit {
 
   ip: string | null;
   customer_id: string;
+  mt5_user_id: string;
+
   updated_by: string;
   created_at: string;
   updated_at: string;

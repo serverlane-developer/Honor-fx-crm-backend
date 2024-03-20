@@ -16,6 +16,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("api_error");
     table.string("ip");
     table.string("customer_id");
+    table.string("mt5_user_id");
     table.string("updated_by");
     table.string("pg_id");
     table.string("payment_status");
