@@ -172,14 +172,6 @@ const updatePayinStatus = async (
         utr_id: transactionExists.utr_id || paymentObj.utr_id,
         payment_order_id: paymentObj.payment_order_id,
         pg_task: isProcessing,
-        ...(!isProcessing && {
-          pg_id: null,
-          pg_order_id: null,
-          payment_status: null,
-          payment_order_id: null,
-          utr_id: null,
-          pg_task: false,
-        }),
       }
     );
     resObj.message = `Transaction Status has been updated to ${txnStatus}`;

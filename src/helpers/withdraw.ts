@@ -13,11 +13,12 @@ import * as pgRepo from "../db_services/payout_gateway_repo";
 import * as pgTransactionsRepo from "../db_services/pg_transaction_repo";
 import * as customerRepo from "../db_services/customer_repo";
 import * as paymentMethodRepo from "../db_services/customer_payment_method_repo";
+import * as mt5UserRepo from "../db_services/mt5_user_repo";
+
 import mt5 from "../services/mt5";
-import { Mt5User } from "../@types/database";
 import { getPaymentMethod } from "./paymentMethodHelper";
 
-const addTransactionOnMt5 = async (transaction_id: string, mt5_user: Mt5User, requestId: requestId) => {
+const addTransactionOnMt5 = async (transaction_id: string, mt5_user_id: string, requestId: requestId) => {
   const trx = await knex.transaction();
   logger.debug("Adding Transaction on Mt5 Server", { requestId, transaction_id });
   try {
@@ -26,6 +27,13 @@ const addTransactionOnMt5 = async (transaction_id: string, mt5_user: Mt5User, re
       await trx.rollback();
       return { status: false, message: "Transaction not Found", data: null };
     }
+
+    const mt5_user = await mt5UserRepo.getMt5UserById(mt5_user_id);
+    if (!mt5_user) {
+      await trx.rollback();
+      return { status: false, message: "MT5 User not Found", data: null };
+    }
+
     const response = await mt5.api.withdraw(mt5_user.mt5_id, transaction.amount, requestId);
     if (!response.status || !response.result) {
       await withdrawRepo.updateTransaction(
@@ -89,6 +97,16 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
       const message = "Looks like Transaction is already on gateway";
       logger.debug(message, { message, requestId });
       await trx.rollback();
+      return {
+        status: false,
+        message,
+        data: null,
+      };
+    }
+
+    if (transaction.mt5_status !== Status.SUCCESS) {
+      const message = "Transaction is not yet successful on mt5";
+      logger.debug(message, { requestId, transaction });
       return {
         status: false,
         message,
@@ -238,7 +256,6 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
           pg_task: false,
           api_error: transferRes.message,
           pg_order_id: null,
-          pg_id: null,
         },
         { trx }
       );

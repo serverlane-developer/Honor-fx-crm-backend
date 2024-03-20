@@ -12,6 +12,8 @@ interface Modules {
   roles: string[];
   admin: string[];
   "payment gateway": string[];
+  transaction: string[];
+  customer: string[];
 }
 
 const modules: Modules = {
@@ -19,6 +21,8 @@ const modules: Modules = {
   roles: ["role"],
   admin: ["user"],
   "payment gateway": ["payout"],
+  transaction: ["withdraw", "deposit"],
+  customer: ["list"],
 };
 
 const moduleKeys = Object.keys(modules);

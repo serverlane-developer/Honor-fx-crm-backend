@@ -635,7 +635,6 @@ const updatePaymentStatus = async (
           payment_fail_count,
           pg_task: isProcessing,
           ...(!isProcessing && {
-            pg_id: null,
             pg_order_id: null,
             payment_status: null,
             payment_order_id: null,

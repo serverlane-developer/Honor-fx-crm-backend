@@ -96,7 +96,7 @@ export const getAllTransactions = async ({
     return countQuery;
   }
 
-  const showPgColumns = ![Status.PENDING, Status.FAILED].includes(status);
+  const showPgColumns = ![Status.PROCESSING, Status.FAILED].includes(status);
   const columns = [
     "t.transaction_id",
     "t.amount",
@@ -108,8 +108,17 @@ export const getAllTransactions = async ({
     "t.is_deleted",
     "t.pg_task",
 
+    // customer
+    "c.phone_number",
+    "c.username",
+
+    // customer payment methods
+    "cpm.bank_name",
+    "cpm.account_name",
+    "cpm.account_number",
+    "cpm.account_ifsc",
+
     // admin
-    "cb.username as created_by",
     "ub.username as updated_by",
   ];
   if (showPgColumns) {
@@ -129,8 +138,9 @@ export const getAllTransactions = async ({
   let query = knexRead(`${tablename} as t`)
     .select(columns)
     .where({ status })
-    .join("admin_user as cb", "t.created_by", "cb.user_id")
+    .join("customer as c", "t.customer_id", "c.customer_id")
     .join("admin_user as ub", "t.updated_by", "ub.user_id")
+    .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
     .orderBy(`t.${order}`, dir);
 
   if (showPgColumns) {
@@ -250,7 +260,7 @@ export const getDetailedTransactionByFilter = async (filter: {
   const query = knexRead(`${tablename} as t`)
     .select(columns)
     .where(filter)
-    .join("admin_user as cb", "t.created_by", "cb.user_id")
+    .join("customer as cb", "t.customer_id", "cb.customer_id")
     .join("admin_user as ub", "t.updated_by", "ub.user_id")
     .leftJoin("payout_gateway as pg", "t.pg_id", "pg.pg_id")
     .first();
