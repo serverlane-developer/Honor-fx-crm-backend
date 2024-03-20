@@ -8,7 +8,6 @@ import config from "../../config";
 import validators from "../../validators/common";
 
 import * as rolesRepo from "../../db_services/roles_repo";
-import logger from "../../utils/logger";
 
 const table_name = "admin_user";
 
@@ -43,17 +42,7 @@ export async function seed(knex: Knex) {
     role_id,
   };
 
-  const rpaAdminObj = {
-    user_id: uuidv4(),
-    username: "rpa",
-    password: encPassword,
-    is_deleted: false,
-    email: "rpa@rpa.com",
-    role_id,
-  };
-
   await knex(table_name).del();
-  await knex(table_name).insert([adminObj, rpaAdminObj]);
+  await knex(table_name).insert([adminObj, ]);
 
-  logger.info("SEED ADMIN ID", { requestId: "seed-admin", rpa_user_id: rpaAdminObj.user_id });
 }

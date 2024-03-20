@@ -17,3 +17,20 @@ export interface PaginationParams {
   search?: string;
   [key: string]: any;
 }
+
+export const enum Status {
+  PENDING = "pending",
+  SUCCESS = "success",
+  FAILED = "failed",
+  PROCESSING = "processing",
+  REFUND = "refund",
+  ACKNOWLEDGED = "acknowledged",
+}
+
+export type transaction_status =
+  | Status.PENDING
+  | Status.SUCCESS
+  | Status.FAILED
+  | Status.PROCESSING
+  | Status.ACKNOWLEDGED;
+export type mt5_status = Status.PENDING | Status.FAILED | Status.SUCCESS;

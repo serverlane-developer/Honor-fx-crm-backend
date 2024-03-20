@@ -12,15 +12,6 @@ import { encrypt } from "../helpers/cipher";
 
 const tablename = "withdraw";
 
-export const statusForList: Record<string, Record<string, string | boolean>> = {
-  pending: { status: Status.PENDING, pg_task: false },
-  success: { status: Status.SUCCESS },
-  failed: { status: Status.FAILED },
-  processing: { status: Status.PENDING, pg_task: true },
-  refund: { status: Status.REFUND },
-  acknowledged: { status: Status.ACKNOWLEDGED },
-};
-
 export const createTransaction = async (
   object: Partial<Withdraw>,
   transaction_id: string = uuidv4(),
@@ -81,24 +72,16 @@ export const getAllTransactions = async ({
   order = "updated_at",
   dir,
   search = "",
-  panel_id,
-  customer,
 }: PaginationParams): Promise<Partial<Withdraw>[] | count> => {
-  const statusExists = status in statusForList;
-  if (status && !statusExists) throw new Error("Status is not configured for list");
-
-  const statusFilter = statusForList[status];
-
   // const searchColumns = ["account_name", "account_number"];
 
   const encryptedText = search ? encrypt(search) : "";
-  const customerFilter = customer ? { ...customer } : {};
   // const searchTexts = Array.from({ length: searchColumns.length }, () => `%${encryptedText}%`);
 
   if (totalRecords) {
     let countQuery = knexRead(tablename)
       .select(knexRead.raw("count(transaction_id) as count"))
-      .where({ ...statusFilter, panel_id, ...customerFilter })
+      .where({ status })
       .first();
 
     if (search) {
@@ -112,20 +95,14 @@ export const getAllTransactions = async ({
 
     return countQuery;
   }
+
   const showPgColumns = ![Status.PENDING, Status.FAILED].includes(status);
   const columns = [
     "t.transaction_id",
-    "t.source_id",
-    "t.username",
-    "t.account_name",
-    "t.account_number",
-    "t.ifsc",
     "t.amount",
-    "t.date",
     "t.transaction_type",
     "t.status",
     "t.api_error",
-    "t.message",
     "t.created_at",
     "t.updated_at",
     "t.is_deleted",
@@ -136,9 +113,6 @@ export const getAllTransactions = async ({
     "ub.username as updated_by",
   ];
   if (showPgColumns) {
-    columns.push("t.rpa_status");
-    columns.push("t.rpa_message");
-    columns.push("t.is_receipt_uploaded");
     columns.push("t.pg_order_id");
     columns.push("t.payment_status");
     columns.push("t.payment_fail_count");
@@ -154,7 +128,7 @@ export const getAllTransactions = async ({
 
   let query = knexRead(`${tablename} as t`)
     .select(columns)
-    .where({ ...statusFilter, ...customerFilter, panel_id })
+    .where({ status })
     .join("admin_user as cb", "t.created_by", "cb.user_id")
     .join("admin_user as ub", "t.updated_by", "ub.user_id")
     .orderBy(`t.${order}`, dir);
@@ -162,97 +136,6 @@ export const getAllTransactions = async ({
   if (showPgColumns) {
     query = query.leftJoin("payout_gateway as pg", "t.pg_id", "pg.pg_id");
   }
-
-  if (search) {
-    // query = query.whereRaw(`${searchColumns.join(" iLIKE ? or ")} iLIKE ?`, searchTexts);
-    query = query.whereRaw(
-      "t.account_number iLIKE ? OR t.account_name iLIKE ? OR t.utr_id iLIKE ? OR t.pg_order_id::text iLIKE ?",
-      [`%${encryptedText}%`, `%${encryptedText}%`, `%${search}%`, `%${search}%`]
-    );
-  }
-
-  if (limit) query = query.limit(limit).offset(skip || 0);
-  // console.log(query.toString());
-  return query;
-};
-
-export const getTransactionsByRpaStatus = async ({
-  limit,
-  skip,
-  totalRecords = false,
-  rpa_status = null,
-  order = "updated_at",
-  dir,
-  search = "",
-}: PaginationParams): Promise<Partial<Withdraw>[] | count> => {
-  const encryptedText = search ? encrypt(search) : "";
-
-  if (totalRecords) {
-    let countQuery = knexRead(tablename)
-      .select(knexRead.raw("count(transaction_id) as count"))
-      .where({ rpa_status })
-      .first();
-
-    if (search) {
-      // countQuery = countQuery.whereRaw(`${searchColumns.join(" iLIKE ? or ")} iLIKE ?`, searchTexts);
-
-      countQuery = countQuery.whereRaw(
-        "account_number iLIKE ? OR account_name iLIKE ? OR utr_id iLIKE ? OR pg_order_id::text iLIKE ?",
-        [`%${encryptedText}%`, `%${encryptedText}%`, `%${search}%`, `%${search}%`]
-      );
-    }
-
-    return countQuery;
-  }
-  const columns = [
-    "t.transaction_id",
-    "t.source_id",
-    "t.username",
-    "t.account_name",
-    "t.account_number",
-    "t.ifsc",
-    "t.amount",
-    "t.date",
-    "t.transaction_type",
-    "t.status",
-    "t.message",
-    "t.api_error",
-    "t.message",
-    "t.ip",
-    "t.created_by",
-    "t.updated_by",
-    "t.created_at",
-    "t.updated_at",
-    "t.is_deleted",
-    "t.pg_id",
-    "t.payment_status",
-    "t.payment_fail_count",
-    "t.payment_req_method",
-    "t.utr_id",
-    "t.payment_creation_date",
-    "t.payment_order_id",
-    "t.pg_task",
-    "t.pg_order_id",
-    "t.rpa_status",
-    "t.rpa_message",
-    "t.is_receipt_uploaded",
-
-    // admin
-    "cb.username as created_by",
-    "ub.username as updated_by",
-
-    // payment gateway
-    "pg.pg_label",
-
-    // ...searchColumns,
-  ];
-  let query = knexRead(`${tablename} as t`)
-    .select(columns)
-    .where({ rpa_status })
-    .leftJoin("payout_gateway as pg", "t.pg_id", "pg.pg_id")
-    .join("admin_user as cb", "t.created_by", "cb.user_id")
-    .join("admin_user as ub", "t.updated_by", "ub.user_id")
-    .orderBy(`t.${order}`, dir);
 
   if (search) {
     // query = query.whereRaw(`${searchColumns.join(" iLIKE ? or ")} iLIKE ?`, searchTexts);
@@ -287,10 +170,6 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
 
     // PG
     "pg.pg_label",
-
-    // rpa
-    "t.rpa_status",
-    "t.rpa_message",
 
     // logs
     // knexRead.raw("cast(t.created_on as text) as updated_at"),
@@ -330,53 +209,18 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
   return query;
 };
 
-export const getTransactionCountForPanels = (panel_ids: string[], status: "pending" | "processing") => {
-  const statusExists = status in statusForList;
-  if (status && !statusExists) throw new Error("Status is not configured for list");
-
-  const statusFilter = statusForList[status];
-
-  const query = knexRead(tablename)
-    .select(knexRead.raw("count(transaction_id) as count"))
-    .where(statusFilter)
-    .whereIn("panel_id", panel_ids)
-    .first();
-  // console.log(query.toString());
-  return query;
-};
-
-export const getTransactionStatsForPanel = (panel_id: string, status: Status) => {
-  const statusExists = status in statusForList;
-  if (status && !statusExists) throw new Error("Status is not configured for list");
-
-  const statusFilter = statusForList[status];
-
-  const query = knexRead(tablename)
-    .select(knexRead.raw("count(transaction_id) as count"))
-    .where({ ...statusFilter, panel_id })
-    .first();
-
-  // console.log(query.toString());
-  return query;
-};
-
 export const getDetailedTransactionByFilter = async (filter: {
   transaction_id: string;
   "t.username": string;
 }): Promise<Withdraw | null> => {
   const columns = [
     "t.transaction_id",
-    "t.source_id",
     "t.username",
-    "t.account_name",
-    "t.account_number",
-    "t.ifsc",
     "t.amount",
     "t.date",
     "t.transaction_type",
     "t.status",
     "t.api_error",
-    "t.message",
     "t.created_at",
     "t.updated_at",
     "t.is_deleted",
@@ -387,9 +231,6 @@ export const getDetailedTransactionByFilter = async (filter: {
     "ub.username as updated_by",
 
     // pg related
-    "t.rpa_status",
-    "t.rpa_message",
-    "t.is_receipt_uploaded",
     "t.pg_order_id",
     "t.payment_status",
     "t.payment_fail_count",

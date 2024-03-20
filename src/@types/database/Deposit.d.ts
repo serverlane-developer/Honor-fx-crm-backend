@@ -1,13 +1,7 @@
 import { Status, mt5_status, transaction_status } from "../Common";
 
-const enum PaymentMethod {
-  IMPS = "IMPS",
-  NEFT = "NEFT",
-}
 
-type payment_req_method = keyof typeof PaymentMethod;
-
-interface Withdraw {
+interface Deposit {
   transaction_id: string;
   amount: string;
   transaction_type: "normal";
@@ -23,7 +17,6 @@ interface Withdraw {
   api_error: string | null;
 
   ip: string | null;
-  payment_method_id: string;
   customer_id: string;
   updated_by: string;
   created_at: string;
@@ -32,16 +25,17 @@ interface Withdraw {
 
   // fields related to payout and pg
   pg_id: string | null;
-  payment_status: string | null;
-  payment_fail_count: number;
-  payment_req_method: payment_req_method | null;
   utr_id: string | null;
-  payment_creation_date: string | null;
+  payment_status: string | null;
   payment_order_id: string | null;
   pg_task: boolean;
   pg_order_id: string | null;
+  dealid: string | null;
+  margin: string | null;
+  freemargin: string | null;
+  equity: string | null;
 }
 
-export { Status, transaction_status, PaymentMethod, payment_req_method };
+export { Status, transaction_status };
 
-export default Withdraw;
+export default Deposit;
