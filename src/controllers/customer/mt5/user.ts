@@ -73,6 +73,14 @@ const getUserById = async (req: CustomerRequest, res: Response) => {
       });
     }
 
+    if (userExists.customer_id !== customer_id) {
+      return res.status(400).json({
+        status: false,
+        message: "MT5 User not found",
+        data: null,
+      });
+    }
+
     const data = {
       ...userExists,
       master_password: decrypt(userExists.master_password || ""),
@@ -99,7 +107,7 @@ const getUsers = async (req: CustomerRequest, res: Response) => {
     const limit = Number(qLimit || 0) || 0;
     const skip = Number(qSkip || 0) || 0;
     const status = qStatus === "enable" ? true : false;
-    const list = (await mt5userRepo.getAllMt5Users({ limit, skip, status })) as Partial<Mt5User>[];
+    const list = (await mt5userRepo.getAllMt5Users({ limit, skip, status, customer_id })) as Partial<Mt5User>[];
     let count = 0;
 
     if (list?.length) {
@@ -108,6 +116,7 @@ const getUsers = async (req: CustomerRequest, res: Response) => {
         skip: null,
         status,
         totalRecords: true,
+        customer_id,
       })) as count;
       count = Number(userCount?.count);
     }

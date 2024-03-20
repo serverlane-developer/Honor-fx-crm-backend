@@ -31,14 +31,19 @@ export const getAllMt5Users = async ({
   limit,
   skip,
   totalRecords = false,
+  customer_id = "",
 }: PaginationParams): Promise<Partial<Mt5User>[] | count> => {
   if (totalRecords) {
-    const countQuery = knexRead(tablename).select(knexRead.raw("count(mt5_user_id) as count")).first();
+    const countQuery = knexRead(tablename)
+      .select(knexRead.raw("count(mt5_user_id) as count"))
+      .where({ customer_id })
+      .first();
     return countQuery;
   }
   const columns = ["m.*", "cb.username as created_by", "ub.username as updated_by"];
   let query = knexRead(`${tablename} as m`)
     .select(columns)
+    .where({ customer_id })
     .join("customer as cb", "m.customer_id", "cb.customer_id")
     .leftJoin("admin_user as ub", "m.updated_by", "ub.user_id")
     .orderBy("m.updated_at", "desc");
