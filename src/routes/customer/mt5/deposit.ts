@@ -1,6 +1,6 @@
 import express from "express";
 
-import customerCtrl from "../../controllers/customer/deposit";
+import customerCtrl from "../../../controllers/customer/mt5/deposit";
 
 const router = express.Router();
 

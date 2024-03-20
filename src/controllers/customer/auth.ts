@@ -18,6 +18,7 @@ import { getCustomerJwtToken as getJwtToken } from "../../helpers/login";
 import smsHelper from "../../helpers/smsHelper";
 import { decrypt, encrypt } from "../../helpers/cipher";
 import config from "../../config";
+import mt5UserHelper from "../../helpers/mt5User";
 
 const getRegistrationTokenKey = (phone_number: string) => phone_number + "_register";
 
@@ -601,6 +602,7 @@ const register = async (req: Request, res: Response) => {
     logger.debug(message, { requestId, customer_id });
 
     await trx.commit();
+    await mt5UserHelper.createUserOnMt5(username, email || phone_number, newCustomer, requestId);
     return res
       .status(200)
       .header("Access-Control-Expose-Headers", "token")

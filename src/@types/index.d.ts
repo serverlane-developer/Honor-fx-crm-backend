@@ -5,6 +5,7 @@ import common from "./Common";
 import Logger from "./Logger";
 import Otp from "./Otp";
 import Payout from "./Payout";
+import Mt5 from "./Mt5";
 
 export default {
   Express,
@@ -14,4 +15,5 @@ export default {
   Logger,
   Otp,
   Payout,
+  Mt5,
 };

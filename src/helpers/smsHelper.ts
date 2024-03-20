@@ -33,7 +33,7 @@ const sendOTPSms = async (phone_number: string, otp: string, requestId: requestI
     const url = `${config.SMS_BASE_URL}/sendhttp.php?${queryString}`;
 
     const response = await axios(url);
-    // console.log({ result: response });
+    if (config.LOG_OTP) logger.debug("OTP SMS Response", { requestId, url, response: response.data });
     const isSuccess = response?.data?.Code === "001";
     if (!isSuccess) {
       logger.error("Error while sending OTP", { response: response?.data, phone_number, otp, url, requestId });

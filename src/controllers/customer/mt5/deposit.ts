@@ -1,19 +1,19 @@
 import { Response } from "express";
 
 import { v4 } from "uuid";
-import logger from "../../utils/logger";
-import { CustomerRequest } from "../../@types/Express";
+import logger from "../../../utils/logger";
+import { CustomerRequest } from "../../../@types/Express";
 
-import * as depositRepo from "../../db_services/deposit_repo";
-import * as pgRepo from "../../db_services/payin_gateway_repo";
-import * as mt5UserRepo from "../../db_services/mt5_user_repo";
+import * as depositRepo from "../../../db_services/deposit_repo";
+import * as pgRepo from "../../../db_services/payin_gateway_repo";
+import * as mt5UserRepo from "../../../db_services/mt5_user_repo";
 
-import validators from "../../validators";
-import { knex } from "../../data/knex";
-import { Deposit } from "../../@types/database";
-import helpers from "../../helpers/helpers";
-import { Status } from "../../@types/database/Deposit";
-import { PayinServices, payinHelper } from "../../services/payin";
+import validators from "../../../validators";
+import { knex } from "../../../data/knex";
+import { Deposit } from "../../../@types/database";
+import helpers from "../../../helpers/helpers";
+import { Status } from "../../../@types/database/Deposit";
+import { PayinServices, payinHelper } from "../../../services/payin";
 
 const createDeposit = async (req: CustomerRequest, res: Response) => {
   const { customer_id, requestId, customer, body } = req;

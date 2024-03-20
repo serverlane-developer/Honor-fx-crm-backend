@@ -1,20 +1,20 @@
 import { Response } from "express";
 
 import { v4 } from "uuid";
-import logger from "../../utils/logger";
-import { CustomerRequest } from "../../@types/Express";
+import logger from "../../../utils/logger";
+import { CustomerRequest } from "../../../@types/Express";
 
-import * as paymentMethodRepo from "../../db_services/customer_payment_method_repo";
-import * as withdrawRepo from "../../db_services/withdraw_repo";
-import * as pgRepo from "../../db_services/payout_gateway_repo";
-import * as mt5UserRepo from "../../db_services/mt5_user_repo";
+import * as paymentMethodRepo from "../../../db_services/customer_payment_method_repo";
+import * as withdrawRepo from "../../../db_services/withdraw_repo";
+import * as pgRepo from "../../../db_services/payout_gateway_repo";
+import * as mt5UserRepo from "../../../db_services/mt5_user_repo";
 
-import validators from "../../validators";
-import { knex } from "../../data/knex";
-import { Withdraw } from "../../@types/database";
-import helpers from "../../helpers/helpers";
-import withdrawHelper from "../../helpers/withdraw";
-import { Status } from "../../@types/database/Withdraw";
+import validators from "../../../validators";
+import { knex } from "../../../data/knex";
+import { Withdraw } from "../../../@types/database";
+import helpers from "../../../helpers/helpers";
+import withdrawHelper from "../../../helpers/withdraw";
+import { Status } from "../../../@types/database/Withdraw";
 
 const createWithdraw = async (req: CustomerRequest, res: Response) => {
   const { customer_id, requestId, customer, body } = req;

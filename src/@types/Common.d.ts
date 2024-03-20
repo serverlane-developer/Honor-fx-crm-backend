@@ -34,3 +34,11 @@ export type transaction_status =
   | Status.PROCESSING
   | Status.ACKNOWLEDGED;
 export type mt5_status = Status.PENDING | Status.FAILED | Status.SUCCESS;
+
+export interface ReturnResponse {
+  status: boolean;
+  message: string;
+  data: {
+    [key: string]: any;
+  } | null;
+}
