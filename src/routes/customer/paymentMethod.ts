@@ -1,11 +1,9 @@
 import express from "express";
 
-import customerCtrl from "../../controllers/customer/paymentMethod";
+import customerCtrl from "../../controllers/customer/paymentGateway";
 
 const router = express.Router();
 
-router.get("/", customerCtrl.getPaymentMethods);
-router.put("/", customerCtrl.togglePaymentMethod);
-router.post("/", customerCtrl.createPaymentMethod);
+router.get("/:pg_type", customerCtrl.getPaymentGateway);
 
 export default router;

@@ -104,3 +104,10 @@ export const getPgListForDropdown = (search?: string) => {
   if (search) query = query.whereRaw("nickname iLIKE ?", [search]);
   return query;
 };
+
+
+export const getListForCustomer = () => {
+  const columns = ["pg_id", "pg_label"];
+  const query = knexRead(tablename).select(columns).where({ is_deleted: false });
+  return query;
+};

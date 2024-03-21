@@ -12,6 +12,7 @@ const router = express.Router();
 router.use("/auth", authRouter);
 router.use("/self", [auth], selfRouter);
 router.use("/payment-method", [auth], paymentMethodRouter);
+router.use("/payment-gateway", [auth], paymentMethodRouter);
 router.use("/mt5", [auth], mt5Router);
 
 export default router;

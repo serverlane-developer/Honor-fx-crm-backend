@@ -132,10 +132,9 @@ const togglePaymentMethod = async (req: CustomerRequest, res: Response) => {
 };
 
 const getPaymentMethods = async (req: CustomerRequest, res: Response) => {
-  const { customer_id, requestId, customer, body } = req;
+  const { customer_id, requestId, customer } = req;
 
   try {
-    const { allow_deleted } = body;
     if (!customer_id || !customer)
       return res.status(400).json({
         status: false,
@@ -145,7 +144,6 @@ const getPaymentMethods = async (req: CustomerRequest, res: Response) => {
 
     const paymentMethods = await paymentMethodRepo.getPaymentMethodsByFilter({
       customer_id,
-      ...(!allow_deleted && { is_deleted: false }),
     });
     let list: CustomerPaymentMethod[] = [];
     if (paymentMethods.length) {
@@ -155,7 +153,7 @@ const getPaymentMethods = async (req: CustomerRequest, res: Response) => {
     return res.status(200).json({ status: true, message: "Profile Info.", data: list });
   } catch (err) {
     const message = "Error while toggling payment method";
-    logger.error(message, { err, customer_id, requestId, body });
+    logger.error(message, { err, customer_id, requestId });
     return res.status(500).json({ status: false, message, data: null });
   }
 };
