@@ -31,7 +31,7 @@ const generatePayduniaHash = (mid: string, key: string, body: Omit<PayinRequest,
 
   const saltedHash = sha256 + salt;
 
-  const hash = crypto.createHmac("sha256", key).update(saltedHash).digest("base64");
+  const hash = crypto.createHmac("sha256", key).update(saltedHash).digest("hex");
   // console.log({ body, stringToHash, key, salt, sha256, saltedHash, hash });
   return hash;
 };
