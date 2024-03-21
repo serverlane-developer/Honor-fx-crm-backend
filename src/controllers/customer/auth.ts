@@ -74,6 +74,7 @@ const sendOTP = async (req: Request, res: Response) => {
         data: {
           phone_number,
           otpSent: true,
+          isRegistered: !!customerExists,
         },
       });
     }
@@ -130,7 +131,7 @@ const sendOTP = async (req: Request, res: Response) => {
     return res.status(200).json({
       status: true,
       message,
-      data: { phone_number, otpSent: true },
+      data: { phone_number, otpSent: true, isRegistered: !!customerExists },
     });
   } catch (err) {
     const message = "Error while sending customer OTP";
@@ -472,7 +473,7 @@ const resendOTP = async (req: Request, res: Response) => {
     return res.status(200).json({
       status: true,
       message,
-      data: { phone_number, otpSent: true },
+      data: { phone_number, otpSent: true, isRegistered: !!customerExists },
     });
   } catch (err) {
     const message = "Error while customer sign in";
