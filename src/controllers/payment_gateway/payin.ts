@@ -47,7 +47,7 @@ const createPayinGateway = async (req: AdminRequest, res: Response) => {
       password,
     };
 
-    const validator = validators.payoutGateway.pgValidation("new").validate(pgObject);
+    const validator = validators.payinGateway.pgValidation("new").validate(pgObject);
     if (validator.error) {
       await trx.rollback();
       const message = validator.error.message;
@@ -141,7 +141,7 @@ const updatePayinGateway = async (req: AdminRequest, res: Response) => {
       password,
     };
 
-    const validator = validators.payoutGateway.pgValidation("old").validate({ ...pgObject, pg_id });
+    const validator = validators.payinGateway.pgValidation("old").validate({ ...pgObject, pg_id });
     if (validator.error) {
       await trx.rollback();
       const message = validator.error.message;
