@@ -39,7 +39,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("equity").nullable();
     table
       .uuid("updated_by")
-      .notNullable()
+      .nullable()
       .references("user_id")
       .inTable("admin_user")
       .onDelete("restrict")

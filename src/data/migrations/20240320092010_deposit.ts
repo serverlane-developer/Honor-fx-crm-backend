@@ -29,7 +29,7 @@ export async function up(knex: Knex): Promise<void> {
     table.uuid("mt5_user_id").notNullable().references("mt5_user_id").inTable("mt5_user").onDelete("restrict");
     table
       .uuid("updated_by")
-      .notNullable()
+      .nullable()
       .references("user_id")
       .inTable("admin_user")
       .onDelete("restrict")
