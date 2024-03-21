@@ -13,7 +13,7 @@ const status = Joi.string().valid(
 
 const depositRequestFields = {
   customer_id: validators.uuid.required(),
-  mt5_user_id: Joi.string().required(),
+  mt5_user_id: validators.uuid.required(),
   pg_id: validators.uuid.required(),
   amount: validators.number.min(1).max(100000).required(),
   ip: Joi.string().optional(),
