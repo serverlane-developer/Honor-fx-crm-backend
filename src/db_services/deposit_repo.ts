@@ -207,7 +207,6 @@ export const getCustomerTransactions = async ({
     "t.created_at",
     "t.updated_at",
     "t.is_deleted",
-    "t.pg_task",
     "t.dealid",
     "t.margin",
     "t.freemargin",

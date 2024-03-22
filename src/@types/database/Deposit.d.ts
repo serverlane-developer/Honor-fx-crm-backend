@@ -29,7 +29,6 @@ interface Deposit {
   utr_id: string | null;
   payment_status: string | null;
   payment_order_id: string | null;
-  pg_task: boolean;
   pg_order_id: string | null;
   dealid: string | null;
   margin: string | null;
