@@ -159,7 +159,7 @@ const updatePayinStatus = async (
   } else if (["FAILED", "REFUND"].includes(paymentStatus) && txnStatus === "success") {
     resObj.message = "Transaction was already Resolved. Cannot Revert Status.";
   } else {
-    const isProcessing = ["SUCCESS", "PENDING"].includes(paymentStatus);
+    // const isProcessing = ["SUCCESS", "PENDING"].includes(paymentStatus);
 
     const updatedTxn = await depositRepo.updateTransaction(
       { transaction_id },
@@ -171,7 +171,6 @@ const updatePayinStatus = async (
         api_error: paymentObj.api_error,
         utr_id: transactionExists.utr_id || paymentObj.utr_id,
         payment_order_id: paymentObj.payment_order_id,
-        pg_task: isProcessing,
       }
     );
     resObj.message = `Transaction Status has been updated to ${txnStatus}`;
