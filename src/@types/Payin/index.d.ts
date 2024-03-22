@@ -8,7 +8,7 @@ type PAYIN = keyof typeof PAYIN_SERVICE;
 
 type PayinResponse = {
   status: boolean;
-  url: string;
+  url: string | null;
   message: string;
   data: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

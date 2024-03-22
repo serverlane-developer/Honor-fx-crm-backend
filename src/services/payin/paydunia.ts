@@ -54,6 +54,15 @@ const getUrl = async (pg: PayinGateway, data: Paydunia.PayinRequest, requestId: 
 
     const payment_url = resData.url;
 
+    if (!payment_url) {
+      return {
+        status: false,
+        message: "Unable to generate payin URL",
+        data: null,
+        url: null,
+      };
+    }
+
     return {
       status: true,
       url: payment_url,
