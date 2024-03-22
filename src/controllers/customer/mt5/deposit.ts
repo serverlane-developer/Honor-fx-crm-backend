@@ -150,10 +150,10 @@ const createDeposit = async (req: CustomerRequest, res: Response) => {
 
     await depositRepo.createTransaction(transaction, transaction_id, { trx });
     await trx.commit();
+    // return res.status(200).json({ status: true, message: "Deposit Created", data: urlRes.data });
 
-    await depositHelper.addTransactionOnMt5(transaction_id, mt5_user_id, requestId);
-
-    return res.status(200).json({ status: true, message: "Deposit Created", data: urlRes.data });
+    const transactionRes = await depositHelper.addTransactionOnMt5(transaction_id, mt5_user_id, requestId);
+    return res.status(transactionRes.status ? 200 : 400).json(transactionRes);
   } catch (err) {
     await trx.rollback();
     const message = "Error while creating deposit";
