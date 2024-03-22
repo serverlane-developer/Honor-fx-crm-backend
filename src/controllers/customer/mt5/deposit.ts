@@ -16,6 +16,7 @@ import helpers from "../../../helpers/helpers";
 import { Status } from "../../../@types/database/Deposit";
 import { PayinServices, payinHelper } from "../../../services/payin";
 import { count } from "../../../@types/Knex";
+import depositHelper from "../../../helpers/deposit";
 
 const createDeposit = async (req: CustomerRequest, res: Response) => {
   const { customer_id, requestId, customer, body } = req;
@@ -101,9 +102,9 @@ const createDeposit = async (req: CustomerRequest, res: Response) => {
       transaction_type: "normal",
       customer_id,
       ip,
-      status: Status.PENDING,
+      status: Status.PROCESSING,
       mt5_status: Status.PENDING,
-      payin_status: Status.PENDING,
+      payin_status: Status.PROCESSING,
       pg_id,
       mt5_user_id,
       pg_order_id,
@@ -149,6 +150,8 @@ const createDeposit = async (req: CustomerRequest, res: Response) => {
 
     await depositRepo.createTransaction(transaction, transaction_id, { trx });
     await trx.commit();
+
+    await depositHelper.addTransactionOnMt5(transaction_id, mt5_user_id, requestId);
 
     return res.status(200).json({ status: true, message: "Deposit Created", data: urlRes.data });
   } catch (err) {
