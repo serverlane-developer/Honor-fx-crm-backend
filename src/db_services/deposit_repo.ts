@@ -156,7 +156,7 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
 };
 
 export const getUniqueOrderId = async (retry = 0): Promise<string | undefined> => {
-  const id = helpers.getRandomId(10);
+  const id = helpers.getRandomId(20);
   const idExists = await knexRead("deposit").select("transaction_id").where({ pg_order_id: id }).first();
   if (!idExists) return id;
   if (retry > 10) throw new Error("Unable to generate Unique Order ID for Payin");
