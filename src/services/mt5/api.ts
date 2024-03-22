@@ -55,7 +55,7 @@ const register = async (client_name: string, email: string, requestId: requestId
       status: false,
       data: null,
       error: true,
-      result: null
+      result: null,
     };
   }
 };
@@ -78,7 +78,7 @@ const deposit = async (mt5_id: string, amount: string, requestId: requestId) => 
     const result = await axios(config);
     const data = result.data as DepositResponse;
 
-    logger.info(`successfully deposited  on mt5`, { requestId, result });
+    logger.info(`successfully deposited  on mt5`, { requestId, response: data });
 
     return data;
   } catch (err) {
@@ -94,8 +94,7 @@ const deposit = async (mt5_id: string, amount: string, requestId: requestId) => 
       status: false,
       data: null,
       error: true,
-      result: null
-
+      result: null,
     };
   }
 };
@@ -118,7 +117,7 @@ const withdraw = async (mt5_id: string, amount: string, requestId: requestId) =>
     const result = await axios(config);
     const data = result.data as WithdrawResponse;
 
-    logger.info(`successfully withdrew from mt5`, { requestId, result });
+    logger.info(`successfully withdrew from mt5`, { requestId, response: data });
 
     return data;
   } catch (err) {
@@ -134,7 +133,7 @@ const withdraw = async (mt5_id: string, amount: string, requestId: requestId) =>
       status: false,
       data: null,
       error: true,
-      result: null
+      result: null,
     };
   }
 };
