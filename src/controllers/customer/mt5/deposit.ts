@@ -124,7 +124,7 @@ const createDeposit = async (req: CustomerRequest, res: Response) => {
     }
 
     const url = await PayinServices[pg_service].getUrl(pg, paymentData, requestId);
-    if (!url.status) {
+    if (!url.status || !url.url) {
       const message = "Unable to payin URL";
       logger.debug(message, { message, requestId, amount });
       await trx.rollback();
