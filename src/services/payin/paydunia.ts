@@ -46,29 +46,35 @@ const getUrl = async (pg: PayinGateway, data: Paydunia.PayinRequest, requestId: 
     };
 
     logger.info(`Request to call payduniya payout api`, { config, requestId });
-    const response = await axios(config);
-
-    logger.info(`Response from payduniya payout api`, { response: response.data, requestId });
-
-    const resData = response.data as Paydunia.PayinUrlResponse;
-
-    const payment_url = resData.url;
-
-    if (!payment_url) {
-      return {
-        status: false,
-        message: "Unable to generate payin URL",
-        data: null,
-        url: null,
-      };
-    }
-
     return {
       status: true,
-      url: payment_url,
-      message: resData?.message,
-      data: null,
+      message: "Payin Config",
+      data: config,
+      url: null,
     };
+    // const response = await axios(config);
+
+    // logger.info(`Response from payduniya payout api`, { response: response.data, requestId });
+
+    // const resData = response.data as Paydunia.PayinUrlResponse;
+
+    // const payment_url = resData.url;
+
+    // if (!payment_url) {
+    //   return {
+    //     status: false,
+    //     message: "Unable to generate payin URL",
+    //     data: config,
+    //     url: null,
+    //   };
+    // }
+
+    // return {
+    //   status: true,
+    //   url: payment_url,
+    //   message: resData?.message,
+    //   data: null,
+    // };
   } catch (err) {
     let message = "Something Wrong With Gateway. Retry again some time later";
     logger.error(message, { err, requestId });

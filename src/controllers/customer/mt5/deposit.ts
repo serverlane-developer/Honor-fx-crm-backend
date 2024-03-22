@@ -123,9 +123,10 @@ const createDeposit = async (req: CustomerRequest, res: Response) => {
       });
     }
 
-    const url = await PayinServices[pg_service].getUrl(pg, paymentData, requestId);
-    if (!url.status || !url.url) {
-      const message = "Unable to payin URL";
+    const urlRes = await PayinServices[pg_service].getUrl(pg, paymentData, requestId);
+
+    if (!urlRes.data) {
+      const message = "Unable to create payin request object";
       logger.debug(message, { message, requestId, amount });
       await trx.rollback();
       return res.status(400).json({
@@ -135,10 +136,21 @@ const createDeposit = async (req: CustomerRequest, res: Response) => {
       });
     }
 
+    // if (!url.status || !url.url) {
+    //   const message = "Unable to payin URL";
+    //   logger.debug(message, { message, requestId, amount });
+    //   await trx.rollback();
+    //   return res.status(400).json({
+    //     status: false,
+    //     message,
+    //     data: null,
+    //   });
+    // }
+
     await depositRepo.createTransaction(transaction, transaction_id, { trx });
     await trx.commit();
 
-    return res.status(200).json({ status: true, message: "Deposit Created", data: { url } });
+    return res.status(200).json({ status: true, message: "Deposit Created", data: urlRes.data });
   } catch (err) {
     await trx.rollback();
     const message = "Error while creating deposit";
