@@ -104,7 +104,7 @@ const createDeposit = async (req: CustomerRequest, res: Response) => {
       ip,
       status: Status.PROCESSING,
       mt5_status: Status.PENDING,
-      payin_status: Status.PROCESSING,
+      payin_status: Status.SUCCESS,
       pg_id,
       mt5_user_id,
       pg_order_id,
