@@ -321,9 +321,6 @@ export const getCustomerTransactions = async ({
     "cpm.account_name",
     "cpm.account_number",
     "cpm.ifsc",
-
-    // admin
-    "ub.username as updated_by",
   ];
   if (showPgColumns) {
     columns.push("t.pg_order_id");
@@ -343,7 +340,7 @@ export const getCustomerTransactions = async ({
     .select(columns)
     .where(filter)
     .join("customer as c", "t.customer_id", "c.customer_id")
-    .join("admin_user as ub", "t.updated_by", "ub.user_id")
+    // .leftJoin("admin_user as ub", "t.updated_by", "ub.user_id")
     .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
     .orderBy(`t.${order}`, dir);
 
