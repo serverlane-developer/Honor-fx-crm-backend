@@ -100,7 +100,7 @@ export const getAllTransactions = async ({
     "cpm.bank_name",
     "cpm.account_name",
     "cpm.account_number",
-    "cpm.account_ifsc",
+    "cpm.ifsc",
 
     // admin
     "ub.username as updated_by",
@@ -320,7 +320,7 @@ export const getCustomerTransactions = async ({
     "cpm.bank_name",
     "cpm.account_name",
     "cpm.account_number",
-    "cpm.account_ifsc",
+    "cpm.ifsc",
 
     // admin
     "ub.username as updated_by",
