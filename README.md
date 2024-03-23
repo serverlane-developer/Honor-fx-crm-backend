@@ -67,6 +67,8 @@ npx knex --knexfile ./src/knexFile.ts migrate:make <<migration-name>> +x ts
 
 npx knex --knexfile ./src/knexFile.ts migrate:latest +x ts
 npx knex --knexfile ./src/knexFile.ts seed:run +x ts
+npx knex --knexfile ./src/knexFile.ts migrate:down <filename.ts>
+npx knex --knexfile ./src/knexFile.ts migrate:up <filename.ts>
 
 ``
 
