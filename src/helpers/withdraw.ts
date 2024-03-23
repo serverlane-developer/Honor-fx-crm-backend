@@ -19,7 +19,12 @@ import * as mt5UserRepo from "../db_services/mt5_user_repo";
 import mt5 from "../services/mt5";
 import { getPaymentMethod } from "./paymentMethodHelper";
 
-const addTransactionOnMt5 = async (transaction_id: string, mt5_user_id: string, requestId: requestId) => {
+const addTransactionOnMt5 = async (
+  transaction_id: string,
+  mt5_user_id: string,
+  user_id: string,
+  requestId: requestId
+) => {
   const trx = await knex.transaction();
   logger.debug("Adding Transaction on Mt5 Server", { requestId, transaction_id });
   try {
@@ -44,6 +49,7 @@ const addTransactionOnMt5 = async (transaction_id: string, mt5_user_id: string, 
           mt5_status: Status.FAILED,
           mt5_message: response.message,
           payout_status: Status.FAILED,
+          updated_by: user_id,
         },
         { trx }
       );
@@ -63,6 +69,7 @@ const addTransactionOnMt5 = async (transaction_id: string, mt5_user_id: string, 
         mt5_status: Status.SUCCESS,
         mt5_message: response.message,
         payout_status: Status.PENDING,
+        updated_by: user_id,
       },
       { trx }
     );

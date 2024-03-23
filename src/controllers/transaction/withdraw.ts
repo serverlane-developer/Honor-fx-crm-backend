@@ -487,7 +487,12 @@ const resolveTransaction = async (req: AdminRequest, res: Response) => {
       });
     }
 
-    const response = await withdrawHelper.addTransactionOnMt5(transaction_id, transaction.mt5_user_id, requestId);
+    const response = await withdrawHelper.addTransactionOnMt5(
+      transaction_id,
+      transaction.mt5_user_id,
+      user_id as string,
+      requestId
+    );
     const isSuccess = response.status;
     if (isSuccess) {
       await withdrawHelper.addTransactionOnGateway(transaction_id, requestId);
