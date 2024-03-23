@@ -141,7 +141,11 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
     knexRead.raw(`row_number() over (partition by t.transaction_id order by t.created_at) as version`),
     "au.username as updated_by",
     "t.status",
-    "t.message",
+    "t.mt5_status",
+    "t.payout_status",
+    "t.admin_message",
+    "t.payout_message",
+    "t.mt5_message",
     "t.api_error",
     knexRead.raw("t.pg_id::text as pg_id"),
     "t.payment_status",
@@ -152,7 +156,6 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
     "t.payment_order_id",
     knexRead.raw("t.pg_task::text as pg_task"),
     knexRead.raw("t.pg_order_id::text"),
-    "t.is_receipt_uploaded",
 
     // PG
     "pg.pg_label",
@@ -171,7 +174,7 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
     .select(logColumns)
     .from(`${tablename}_logs as t`)
     .leftJoin("payout_gateway as pg", knexRead.raw("CAST(t.pg_id as uuid) = pg.pg_id"))
-    .join("admin_user as au", knexRead.raw("CAST(t.updated_by as uuid) = au.user_id"))
+    .leftJoin("admin_user as au", knexRead.raw("CAST(t.updated_by as uuid) = au.user_id"))
     .where("t.transaction_id", id);
   query = query
     .union((qb) => {
@@ -185,7 +188,7 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
       qb.select(columns)
         .from(`${tablename} as t`)
         .leftJoin("payout_gateway as pg", knexRead.raw("CAST(t.pg_id as uuid) = pg.pg_id"))
-        .join("admin_user as au", knexRead.raw("CAST(t.updated_by as uuid) = au.user_id"))
+        .leftJoin("admin_user as au", knexRead.raw("CAST(t.updated_by as uuid) = au.user_id"))
         .where("t.transaction_id", id);
     }, true)
     .orderBy("version", "asc");
