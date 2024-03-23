@@ -356,9 +356,14 @@ const createRefund = async (transaction_id: string, requestId: requestId) => {
       return { status: false, message: "MT5 User not Found", data: null };
     }
 
-    if (transaction.payout_status !== Status.FAILED) {
+    if (transaction.payout_status === Status.PROCESSING) {
       await trx.rollback();
-      return { status: false, message: "Payout has yet FAILED", data: null };
+      return { status: false, message: "Payout already sent to gateway", data: null };
+    }
+
+    if (transaction.payout_status === Status.SUCCESS) {
+      await trx.rollback();
+      return { status: false, message: "Payout already completed on gateway", data: null };
     }
 
     if (transaction.mt5_status !== Status.SUCCESS) {

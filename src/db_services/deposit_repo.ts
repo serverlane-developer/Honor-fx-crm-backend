@@ -90,9 +90,22 @@ PaginationParams): Promise<Partial<Deposit>[] | count> => {
     "t.transaction_id",
     "t.amount",
     "t.transaction_type",
+
     "t.utr_id",
-    "t.status",
+
     "t.dealid",
+    "t.margin",
+    "t.freemargin",
+    "t.equity",
+    //
+    "t.status",
+    "t.mt5_status",
+    "t.payin_status",
+    //
+    "t.admin_message",
+    "t.payin_message",
+    "t.mt5_message",
+    //
 
     "t.created_at",
     "t.updated_at",
