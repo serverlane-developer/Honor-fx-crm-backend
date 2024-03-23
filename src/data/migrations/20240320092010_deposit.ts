@@ -68,6 +68,14 @@ export async function up(knex: Knex): Promise<void> {
     table.string("margin").nullable();
     table.string("freemargin").nullable();
     table.string("equity").nullable();
+
+    table
+      .uuid("refund_transaction_id")
+      .nullable()
+      .references("transaction_id")
+      .inTable("withdraw")
+      .onDelete("restrict");
+    table.boolean("is_receipt_uploaded").defaultTo(false);
   });
   await knex.raw(`
   CREATE TRIGGER update_timestamp

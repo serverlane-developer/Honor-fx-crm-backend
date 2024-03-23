@@ -29,6 +29,9 @@ export async function up(knex: Knex): Promise<void> {
     table.string("freemargin");
     table.string("equity");
 
+    table.string("refund_transaction_id");
+    table.boolean("is_receipt_uploaded");
+
     table.string("created_at");
     table.string("updated_at");
     table.boolean("is_deleted").defaultTo(false);

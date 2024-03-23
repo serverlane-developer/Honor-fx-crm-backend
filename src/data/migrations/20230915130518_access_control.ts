@@ -27,7 +27,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   await knex.schema.table(TABLE_NAME, function (table) {
-    table.dropForeign("module_id");
+    table.dropForeign("submodule_id");
     table.dropForeign("role_id");
     table.dropForeign("created_by");
     table.dropForeign("updated_by");

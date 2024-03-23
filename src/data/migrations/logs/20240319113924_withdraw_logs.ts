@@ -24,6 +24,8 @@ export async function up(knex: Knex): Promise<void> {
     table.string("freemargin");
     table.string("equity");
 
+    table.boolean("is_receipt_uploaded");
+
     table.string("updated_by");
     table.string("pg_id");
     table.string("payment_status");

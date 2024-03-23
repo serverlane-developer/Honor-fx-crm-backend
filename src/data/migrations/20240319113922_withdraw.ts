@@ -91,6 +91,8 @@ export async function up(knex: Knex): Promise<void> {
       .nullable()
       .defaultTo(null)
       .comment("uuid created to check transaction status on payment gateway.");
+
+    table.boolean("is_receipt_uploaded").defaultTo(false);
   });
   await knex.raw(`
   CREATE TRIGGER update_timestamp

@@ -22,6 +22,8 @@ const columns = [
   "margin",
   "freemargin",
   "equity",
+  "refund_transaction_id",
+  "is_receipt_uploaded",
   "updated_by",
   "pg_id",
   "payment_status",

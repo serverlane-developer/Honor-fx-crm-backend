@@ -3,7 +3,7 @@ import { Status, mt5_status, transaction_status } from "../Common";
 interface Deposit {
   transaction_id: string;
   amount: string;
-  transaction_type: "normal";
+  transaction_type: "normal" | "refund";
 
   // fields to track transaction
   status: transaction_status;
@@ -30,10 +30,14 @@ interface Deposit {
   payment_status: string | null;
   payment_order_id: string | null;
   pg_order_id: string | null;
+  
   dealid: string | null;
   margin: string | null;
   freemargin: string | null;
   equity: string | null;
+
+  refund_transaction_id: string;
+  is_receipt_uploaded: boolean;
 }
 
 export { Status, transaction_status };
