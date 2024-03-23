@@ -20,7 +20,7 @@ const modules: Modules = {
   modules: ["module", "submodule"],
   roles: ["role"],
   admin: ["user"],
-  "payment gateway": ["payout"],
+  "payment gateway": ["payout", "payina"],
   transaction: ["withdraw", "deposit"],
   customer: ["list"],
 };
