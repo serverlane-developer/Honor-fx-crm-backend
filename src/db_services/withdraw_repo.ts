@@ -80,7 +80,7 @@ export const getAllTransactions = async ({
     return countQuery;
   }
 
-  const showPgColumns = ![Status.PROCESSING, Status.FAILED, Status.SUCCESS].includes(status);
+  const showPgColumns = [Status.PROCESSING, Status.FAILED, Status.SUCCESS].includes(status);
   const columns = [
     "t.transaction_id",
     "t.amount",
@@ -136,6 +136,7 @@ export const getAllTransactions = async ({
     .where({ status })
     .join("customer as c", "t.customer_id", "c.customer_id")
     .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
+    .join("payout_gateway as pg", "pg.pg_id", "t.pg_id")
     .leftJoin("admin_user as ub", "t.updated_by", "ub.user_id")
     .orderBy(`t.${order}`, dir);
 
