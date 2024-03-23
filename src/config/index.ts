@@ -64,6 +64,7 @@ const envVarsSchema = joi
     MT5_SERVER_URL: joi.string().uri().required(),
     MT5_LEVERAGE: joi.string().required(),
     MT5_COUNTRY: joi.string().required(),
+    MT5_IP: joi.string().required(),
   })
   .unknown()
   .when(joi.object({ NODE_ENV: "production" }).unknown(), {
@@ -168,6 +169,7 @@ const config = {
   MT5_SERVER_URL: envVars.MT5_SERVER_URL as string,
   MT5_COUNTRY: envVars.MT5_COUNTRY as string,
   MT5_LEVERAGE: Number(envVars.MT5_LEVERAGE),
+  MT5_IP: envVars.MT5_IP,
 };
 
 export default config;
