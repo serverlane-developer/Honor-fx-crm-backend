@@ -131,7 +131,7 @@ const createWithdraw = async (req: CustomerRequest, res: Response) => {
       ip,
       status: Status.PENDING,
       mt5_status: Status.PENDING,
-      payout_message: Status.PENDING,
+      payout_status: Status.PENDING,
       pg_id,
       payment_method_id,
       mt5_user_id,

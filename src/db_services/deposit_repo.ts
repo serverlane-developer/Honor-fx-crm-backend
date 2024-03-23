@@ -92,6 +92,7 @@ PaginationParams): Promise<Partial<Deposit>[] | count> => {
     "t.transaction_type",
     "t.utr_id",
     "t.status",
+    "t.dealid",
 
     "t.created_at",
     "t.updated_at",
