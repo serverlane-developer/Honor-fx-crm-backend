@@ -183,7 +183,7 @@ const createPaymentData = (
 };
 
 const WebhookStatus = {
-  PENDING: ["ACCEPTED", "PENDING", "INPROGRESS", "PROCESSING", "HOLD", "IN PROCESS"],
+  PROCESSING: ["ACCEPTED", "PENDING", "INPROGRESS", "PROCESSING", "HOLD", "IN PROCESS"],
   SUCCESS: ["SUCCESS", "CREATED", "SUCCESS"],
   FAILED: [
     "ERROR",
@@ -272,14 +272,14 @@ const updatePaymentStatus = async (
     paymentObj.status = txnStatus;
     paymentObj.pg_order_id = transferId;
     paymentObj.payment_status =
-      paymentStatus === "SUCCESS" ? (acknowledged ? paymentStatus.toLowerCase() : "PENDING") : paymentStatus;
+      paymentStatus === "SUCCESS" ? (acknowledged ? paymentStatus.toLowerCase() : "PROCESSING") : paymentStatus;
     paymentObj.payment_creation_date = processedOn;
     if (utr) paymentObj.utr_id = utr;
     if (referenceId) paymentObj.payment_order_id = referenceId;
     if (message) paymentObj.message = message;
     if (reason) paymentObj.api_error = reason;
     paymentObj.under_processing =
-      paymentStatus === "PENDING" ? true : paymentStatus === "SUCCESS" ? !acknowledged : false;
+      paymentStatus === "PROCESSING" ? true : paymentStatus === "SUCCESS" ? !acknowledged : false;
   }
 
   // EASYPAYMENTZ
@@ -319,7 +319,7 @@ const updatePaymentStatus = async (
     if (utr) paymentObj.utr_id = utr;
     if (paymentOrderId) paymentObj.payment_order_id = paymentOrderId;
     if (transactionMessage || message) paymentObj.message = transactionMessage || message;
-    paymentObj.under_processing = paymentStatus === "PENDING";
+    paymentObj.under_processing = paymentStatus === "PROCESSING";
   }
 
   // QIKPAY
@@ -356,7 +356,7 @@ const updatePaymentStatus = async (
     if (opid) paymentObj.utr_id = opid;
     if (MSG && paymentStatus === "FAILED") paymentObj.api_error = MSG;
     else if (MSG) paymentObj.message = MSG;
-    paymentObj.under_processing = paymentStatus === "PENDING";
+    paymentObj.under_processing = paymentStatus === "PROCESSING";
   }
 
   // ISERVEU
@@ -395,7 +395,7 @@ const updatePaymentStatus = async (
     paymentObj.payment_order_id = rrn;
     if (statusDesc) paymentObj.message = statusDesc;
     if (reason) paymentObj.api_error = reason;
-    paymentObj.under_processing = paymentStatus === "PENDING";
+    paymentObj.under_processing = paymentStatus === "PROCESSING";
   }
 
   // PAYCOONS
@@ -430,7 +430,7 @@ const updatePaymentStatus = async (
     if (rrn) paymentObj.utr_id = rrn;
     if (message && paymentStatus === "FAILED") paymentObj.api_error = message;
     if (message) paymentObj.message = message;
-    paymentObj.under_processing = paymentStatus === "PENDING";
+    paymentObj.under_processing = paymentStatus === "PROCESSING";
   }
 
   // ZAPAY
@@ -464,7 +464,7 @@ const updatePaymentStatus = async (
     paymentObj.payment_order_id = Gateway_RefID;
     paymentObj.payment_status = paymentStatus;
     if (Bank_RefID) paymentObj.utr_id = Bank_RefID;
-    paymentObj.under_processing = paymentStatus === "PENDING";
+    paymentObj.under_processing = paymentStatus === "PROCESSING";
   }
 
   // ISMARTPAY
@@ -497,7 +497,7 @@ const updatePaymentStatus = async (
     paymentObj.pg_order_id = order_id;
     paymentObj.payment_order_id = transaction_id;
     paymentObj.payment_status = paymentStatus;
-    paymentObj.under_processing = paymentStatus === "PENDING";
+    paymentObj.under_processing = paymentStatus === "PROCESSING";
     paymentObj.payment_creation_date = created_on;
     if (bank_id) paymentObj.utr_id = bank_id;
     if (message && paymentStatus === "FAILED") paymentObj.api_error = message;
@@ -519,7 +519,7 @@ const updatePaymentStatus = async (
     }
     transactionExists = transaction;
 
-    const paymentStatus = transaction_status ? getPaymentStatus(transaction_status) : "PENDING";
+    const paymentStatus = transaction_status ? getPaymentStatus(transaction_status) : "PROCESSING";
     if (!paymentStatus) {
       logger.error("Unhandled Status received from PayAnyTime", {
         requestId,
@@ -536,7 +536,7 @@ const updatePaymentStatus = async (
     paymentObj.pg_order_id = id;
     paymentObj.payment_order_id = decentro_txn_id;
     paymentObj.payment_status = paymentStatus;
-    paymentObj.under_processing = paymentStatus === "PENDING";
+    paymentObj.under_processing = paymentStatus === "PROCESSING";
     // paymentObj.payment_creation_date = timestamp;
     if (utr && paymentStatus === "SUCCESS") paymentObj.utr_id = utr;
   }
@@ -573,7 +573,7 @@ const updatePaymentStatus = async (
     if (rrn) paymentObj.utr_id = rrn;
     if (message && paymentStatus === "FAILED") paymentObj.api_error = message;
     if (message) paymentObj.message = message;
-    paymentObj.under_processing = paymentStatus === "PENDING";
+    paymentObj.under_processing = paymentStatus === "PROCESSING";
   }
 
   // UPDATE PAYMENT STATUS IN DB
@@ -598,7 +598,7 @@ const updatePaymentStatus = async (
     data: null,
   };
 
-  if (paymentStatus === "PENDING" && txnStatus !== "pending") {
+  if (paymentStatus === "PROCESSING" && txnStatus !== "processing") {
     resObj.message = "Transaction Status on gateway has changed. Please Try Again";
   } else if (["FAILED", "REFUND"].includes(paymentStatus) && txnStatus === "success") {
     resObj.message = "Transaction was already Paid. Cannot Revert Status.";
@@ -607,7 +607,7 @@ const updatePaymentStatus = async (
       ? Number(transactionExists.payment_fail_count || 0) + 1
       : transactionExists.payment_fail_count;
 
-    const isProcessing = ["SUCCESS", "PENDING"].includes(paymentStatus);
+    const isProcessing = ["SUCCESS", "PROCESSING"].includes(paymentStatus);
     const isSuccess = paymentStatus === "SUCCESS";
 
     let updatedTxn = null;
