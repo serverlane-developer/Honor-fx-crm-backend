@@ -513,6 +513,38 @@ const resolveTransaction = async (req: AdminRequest, res: Response) => {
   }
 };
 
+const createRefund = async (req: AdminRequest, res: Response) => {
+  const { params, requestId, user_id, query } = req;
+  const { transaction_id } = params;
+  try {
+    const validator = validators.common.uuid.validate(transaction_id);
+    if (validator.error) {
+      const message = validator.error.message;
+      logger.debug("Invalid Transaction Status", { message, requestId, params, user_id, query });
+      return res.status(400).json({
+        status: false,
+        message,
+        data: null,
+      });
+    }
+
+    const response = await withdrawHelper.createRefund(transaction_id, requestId);
+    const isSuccess = response.status;
+    return res.status(isSuccess ? 200 : 400).json({
+      status: isSuccess,
+      message: response.message,
+      data: response.data,
+    });
+  } catch (err) {
+    const message = "Error while creating refund transaction";
+    logger.error(message, { err, requestId, params, query, user_id });
+    return res.status(500).json({
+      status: false,
+      message,
+    });
+  }
+};
+
 export default {
   updatePaymentStatus,
   updateMultiplePaymentStatus,
@@ -522,4 +554,5 @@ export default {
   getTransactionHistory,
   getPaymentHistory,
   resolveTransaction,
+  createRefund,
 };

@@ -5,6 +5,7 @@ import transactionCtrl from "../../controllers/transaction";
 const router = express.Router();
 
 router.post("/retry/payout/:transaction_id", transactionCtrl.withdraw.retryPayout);
+router.post("/refund/:transaction_id", transactionCtrl.withdraw.createRefund);
 
 router.put("/payout-status/:pg_order_id", transactionCtrl.withdraw.updatePaymentStatus);
 router.put("/payout-status", transactionCtrl.withdraw.updateMultiplePaymentStatus);

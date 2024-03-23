@@ -15,8 +15,10 @@ import * as pgTransactionsRepo from "../db_services/pg_transaction_repo";
 import * as customerRepo from "../db_services/customer_repo";
 import * as paymentMethodRepo from "../db_services/customer_payment_method_repo";
 import * as mt5UserRepo from "../db_services/mt5_user_repo";
+import * as depositRepo from "../db_services/deposit_repo";
 
 import mt5 from "../services/mt5";
+import { Deposit } from "../@types/database";
 import { getPaymentMethod } from "./paymentMethodHelper";
 
 const addTransactionOnMt5 = async (
@@ -338,4 +340,79 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
   }
 };
 
-export default { addTransactionOnMt5, addTransactionOnGateway };
+const createRefund = async (transaction_id: string, requestId: requestId) => {
+  const trx = await knex.transaction();
+  logger.debug("Creating Deposit Refund transaction for withdraw", { requestId, transaction_id });
+  try {
+    const transaction = await withdrawRepo.getTransactionById(transaction_id, { trx });
+    if (!transaction) {
+      await trx.rollback();
+      return { status: false, message: "Transaction not Found", data: null };
+    }
+
+    const mt5_user = await mt5UserRepo.getMt5UserById(transaction.mt5_user_id);
+    if (!mt5_user) {
+      await trx.rollback();
+      return { status: false, message: "MT5 User not Found", data: null };
+    }
+
+    if (transaction.payout_status !== Status.FAILED) {
+      await trx.rollback();
+      return { status: false, message: "Payout has yet FAILED", data: null };
+    }
+
+    if (transaction.mt5_status !== Status.SUCCESS) {
+      await trx.rollback();
+      return { status: false, message: "Transaction was not successful on Mt5", data: null };
+    }
+
+    const response = await mt5.api.deposit(mt5_user.mt5_id, transaction.amount, requestId);
+    if (!response.status || !response.result) {
+      await trx.rollback();
+      return { status: false, data: response, message: "Failed to create deposit refund from Mt5" };
+    }
+    const { dealid, equity, freemargin, margin } = response.result;
+
+    const deposit_id = v4();
+    const depositObj: Partial<Deposit> = {
+      transaction_id,
+      admin_message: "Refund",
+      transaction_type: "refund",
+      amount: transaction.amount,
+      customer_id: transaction.customer_id,
+      mt5_user_id: transaction.mt5_user_id,
+      ip: transaction.ip,
+
+      status: Status.SUCCESS,
+      payin_status: Status.SUCCESS,
+      mt5_status: Status.SUCCESS,
+      mt5_message: response.message,
+
+      dealid: String(dealid),
+      equity: String(equity),
+      freemargin: String(freemargin),
+      margin: String(margin),
+
+      refund_transaction_id: transaction_id,
+    };
+    await depositRepo.createTransaction(depositObj, deposit_id, { trx });
+    await withdrawRepo.updateTransaction(
+      { transaction_id },
+      {
+        status: Status.FAILED,
+        refund_transaction_id: deposit_id,
+      },
+      { trx }
+    );
+
+    await trx.commit();
+    return { status: true, data: response, message: "Create refund Transaction" };
+  } catch (err) {
+    await trx.rollback();
+    const message = "Error while creating refund transaction";
+    logger.error(message, { err, requestId, transaction_id });
+    return { status: false, message, data: null };
+  }
+};
+
+export default { addTransactionOnMt5, addTransactionOnGateway, createRefund };

@@ -80,7 +80,7 @@ export const getAllTransactions = async ({
     return countQuery;
   }
 
-  const showPgColumns = ![Status.PROCESSING, Status.FAILED].includes(status);
+  const showPgColumns = ![Status.PROCESSING, Status.FAILED, Status.SUCCESS].includes(status);
   const columns = [
     "t.transaction_id",
     "t.amount",
