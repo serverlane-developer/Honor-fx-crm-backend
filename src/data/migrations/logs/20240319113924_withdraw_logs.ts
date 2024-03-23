@@ -17,11 +17,12 @@ export async function up(knex: Knex): Promise<void> {
     table.string("ip");
     table.string("payment_method_id");
     table.string("customer_id");
+    table.string("mt5_user_id");
 
     table.string("dealid");
     table.string("margin");
     table.string("freemargin");
-    table.string("equity");    
+    table.string("equity");
 
     table.string("updated_by");
     table.string("pg_id");
