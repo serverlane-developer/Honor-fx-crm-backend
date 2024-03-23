@@ -1,4 +1,5 @@
 import { v4 } from "uuid";
+import axios from "axios";
 import { knex } from "../data/knex";
 
 import { Status, payment_req_method } from "../@types/database/Withdraw";
@@ -68,7 +69,13 @@ const addTransactionOnMt5 = async (transaction_id: string, mt5_user_id: string, 
     return { status: true, data: response, message: "Added Transaction on MT5 Server" };
   } catch (err) {
     await trx.rollback();
-    const message = "Error while adding Transaction on Mt5 Server";
+    let message = "Error while adding Transaction on Mt5 Server";
+    if (axios.isAxiosError(err)) {
+      message = err.response?.data?.error || JSON.stringify(err.response?.data);
+    } else if (err instanceof Error) {
+      message = err.message;
+    }
+
     logger.error(message, { err, requestId, transaction_id });
     return { status: false, message, data: null };
   }
