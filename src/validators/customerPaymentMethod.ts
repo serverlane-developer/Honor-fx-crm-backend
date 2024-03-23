@@ -7,7 +7,7 @@ const newPaymentMethod = Joi.object({
   ifsc: Joi.string().optional(),
   bank_name: Joi.string().optional(),
   account_name: Joi.string().optional(),
-  upi_id: Joi.string().optional(),
+  upi_id: Joi.string().optional().allow(""),
   description: Joi.string().optional().allow(""),
 })
   .when(Joi.object({ payment_method: PaymentMethod.BANK }).unknown(), {
