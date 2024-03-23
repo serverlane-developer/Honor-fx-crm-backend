@@ -16,6 +16,7 @@ const columns = [
   "leverage",
   "mt_group",
   "country",
+  "mt5_ip",
   "updated_by",
   "created_at",
   "updated_at",

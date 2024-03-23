@@ -6,6 +6,7 @@ import mt5 from "../services/mt5";
 import logger from "../utils/logger";
 
 import * as mt5UserRepo from "../db_services/mt5_user_repo";
+import config from "../config";
 import { decrypt, encrypt } from "./cipher";
 
 const getUser = (data: Partial<Mt5User>, type: "encrypt" | "decrypt") => {
@@ -67,6 +68,7 @@ const createUserOnMt5 = async (
       mt5_id: mt5_id.toString(),
       mt_group,
       status: Status.SUCCESS,
+      mt5_ip: config.MT5_IP,
     };
     const encryptedUser = getUser(newUser, "encrypt");
     await mt5UserRepo.createMt5User(encryptedUser, mt5_user_id, { trx });

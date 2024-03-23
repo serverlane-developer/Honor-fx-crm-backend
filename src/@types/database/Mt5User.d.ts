@@ -14,6 +14,7 @@ interface Mt5User {
   leverage: string;
   mt_group: string;
   country: string;
+  mt5_ip: string;
   customer_id: string;
   updated_by: string | null;
   created_at: string;
