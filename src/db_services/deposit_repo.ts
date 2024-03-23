@@ -112,6 +112,8 @@ PaginationParams): Promise<Partial<Deposit>[] | count> => {
 
     // admin
     "cb.username as created_by",
+    "cb.phone_number",
+
     "ub.username as updated_by",
   ];
 
@@ -252,6 +254,13 @@ export const getCustomerTransactions = async ({
   }
 
   if (limit) query = query.limit(limit).offset(skip || 0);
+  // console.log(query.toString());
+  return query;
+};
+
+export const getTotalTransactions = (customer_id: string) => {
+  const columns = [knexRead.raw("count(transaction_id) as count"), knexRead.raw(" COALESCE(sum(amount::numeric), 0) as sum")];
+  const query = knexRead(tablename).select(columns).where({ customer_id, status: Status.SUCCESS }).first();
   // console.log(query.toString());
   return query;
 };

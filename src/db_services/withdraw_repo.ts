@@ -84,15 +84,15 @@ export const getAllTransactions = async ({
   const columns = [
     "t.transaction_id",
     "t.amount",
-    // 
+    //
     "t.status",
     "t.mt5_status",
     "t.payout_status",
-    // 
+    //
     "t.admin_message",
     "t.payout_message",
     "t.mt5_message",
-    // 
+    //
     "t.api_error",
     "t.created_at",
     "t.updated_at",
@@ -105,7 +105,7 @@ export const getAllTransactions = async ({
     "t.equity",
     // customer
     "c.phone_number",
-    "c.username",
+    "c.username as created_by",
 
     // customer payment methods
     "cpm.bank_name",
@@ -367,6 +367,14 @@ export const getCustomerTransactions = async ({
   }
 
   if (limit) query = query.limit(limit).offset(skip || 0);
+  // console.log(query.toString());
+  return query;
+};
+
+export const getTotalTransactions = (customer_id: string) => {
+  const columns = [knexRead.raw("count(transaction_id) as count"), knexRead.raw("COALESCE(sum(amount::numeric), 0) as sum")];
+
+  const query = knexRead(tablename).select(columns).where({ customer_id, status: Status.SUCCESS }).first();
   // console.log(query.toString());
   return query;
 };
