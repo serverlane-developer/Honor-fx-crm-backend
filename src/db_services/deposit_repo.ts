@@ -104,7 +104,7 @@ PaginationParams): Promise<Partial<Deposit>[] | count> => {
   let query = knexRead(`${tablename} as t`)
     .select(columns)
     .where({ status })
-    .join("admin_user as cb", "t.created_by", "cb.user_id")
+    .join("customer as cb", "t.customer_id", "cb.customer_id")
     .join("admin_user as ub", "t.updated_by", "ub.user_id")
     .orderBy(`t.${order}`, dir);
 
