@@ -8,6 +8,7 @@
     "dev": "nodemon src/server.ts",
     "prod": "npx tsc && node dist/server.js",
     "migrate": "npx knex --knexfile ./src/knexFile.ts migrate:latest +x ts",
+    "rollback": "npx knex --knexfile ./src/knexFile.ts migrate:rollback +x ts",
     "seed": "npx knex --knexfile ./src/knexFile.ts seed:run +x ts",
     "db-init": "npx knex --knexfile ./src/knexFile.ts migrate:latest +x ts && npx knex --knexfile ./src/knexFile.ts seed:run +x ts",
     "lint": "tsc --noEmit && eslint .",
