@@ -136,12 +136,11 @@ export const getAllTransactions = async ({
     .where({ status })
     .join("customer as c", "t.customer_id", "c.customer_id")
     .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
-    .join("payout_gateway as pg", "pg.pg_id", "t.pg_id")
     .leftJoin("admin_user as ub", "t.updated_by", "ub.user_id")
     .orderBy(`t.${order}`, dir);
 
   if (showPgColumns) {
-    query = query.leftJoin("payout_gateway as pg", "t.pg_id", "pg.pg_id");
+    query = query.join("payout_gateway as pg", "t.pg_id", "pg.pg_id");
   }
 
   if (limit) query = query.limit(limit).offset(skip || 0);
