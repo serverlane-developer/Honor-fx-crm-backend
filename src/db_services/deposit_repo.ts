@@ -105,7 +105,7 @@ PaginationParams): Promise<Partial<Deposit>[] | count> => {
     .select(columns)
     .where({ status })
     .join("customer as cb", "t.customer_id", "cb.customer_id")
-    .join("admin_user as ub", "t.updated_by", "ub.user_id")
+    .leftJoin("admin_user as ub", "t.updated_by", "ub.user_id")
     .orderBy(`t.${order}`, dir);
 
   if (limit) query = query.limit(limit).offset(skip || 0);

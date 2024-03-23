@@ -22,6 +22,9 @@ const newPaymentMethod = Joi.object({
     then: Joi.object().append({
       upi_id: Joi.string().required(),
       account_name: Joi.string().required(),
+      account_number: Joi.forbidden(),
+      ifsc: Joi.forbidden(),
+      bank_name: Joi.forbidden(),
     }),
   });
 

@@ -420,11 +420,14 @@ const updatePgTransactionStatus = async (req: AdminRequest, res: Response) => {
   }
 };
 
-const approveTransaction = async (req: AdminRequest, res: Response) => {
-  const { params, requestId, user_id } = req;
+const resolveTransaction = async (req: AdminRequest, res: Response) => {
+  const { params, requestId, user_id, body } = req;
   const { transaction_id } = params;
   try {
-    const validator = validators.common.uuid.required().validate(transaction_id);
+    const { status, message } = body;
+    const validator = validators.withdraw.updateTransactionStatus
+      .required()
+      .validate({ transaction_id, status, message });
     if (validator.error) {
       const message = validator.error.message;
       logger.debug("approve transaction, id validation error", { message, requestId, params, user_id });
@@ -466,8 +469,29 @@ const approveTransaction = async (req: AdminRequest, res: Response) => {
       });
     }
 
+    if (status === Status.FAILED) {
+      await withdrawRepo.updateTransaction(
+        { transaction_id },
+        {
+          status: Status.FAILED,
+          mt5_status: Status.FAILED,
+          payout_status: Status.FAILED,
+          updated_by: user_id,
+          admin_message: message,
+        }
+      );
+      return res.status(200).json({
+        status: true,
+        message: "Successfully rejected transaction",
+        data: null,
+      });
+    }
+
     const response = await withdrawHelper.addTransactionOnMt5(transaction_id, transaction.mt5_user_id, requestId);
     const isSuccess = response.status;
+    if (isSuccess) {
+      await withdrawHelper.addTransactionOnGateway(transaction_id, requestId);
+    }
     return res.status(isSuccess ? 200 : 400).json({
       status: isSuccess,
       message: response.message,
@@ -491,5 +515,5 @@ export default {
   retryPayout,
   getTransactionHistory,
   getPaymentHistory,
-  approveTransaction,
+  resolveTransaction,
 };

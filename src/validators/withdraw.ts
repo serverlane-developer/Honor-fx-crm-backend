@@ -59,23 +59,11 @@ const withdrawRequest = Joi.object(withdrawRequestFields);
 
 // const updateTransaction = Joi.object({ ...newTransactionFields, ...pgFields });
 
-// const updateTransactionStatus = Joi.object()
-//   .keys({
-//     transaction_id: validators.uuid.required(),
-//     status: Joi.string().valid(Status.FAILED, Status.SUCCESS).required(),
-//   })
-//   .when(".status", {
-//     is: Joi.string().valid(Status.SUCCESS),
-//     then: Joi.object({
-//       utr_id: Joi.string().required(),
-//     }),
-//   })
-//   .when(".status", {
-//     is: Joi.string().valid(Status.FAILED),
-//     then: Joi.object({
-//       api_error: Joi.string().required(),
-//     }),
-//   });
+const updateTransactionStatus = Joi.object().keys({
+  transaction_id: validators.uuid.required(),
+  status: Joi.string().valid(Status.FAILED, Status.SUCCESS).required(),
+  message: Joi.string().required(),
+});
 
 export default {
   // newTransaction,
@@ -83,4 +71,5 @@ export default {
   // updateTransactionStatus,
   status,
   withdrawRequest,
+  updateTransactionStatus,
 };
