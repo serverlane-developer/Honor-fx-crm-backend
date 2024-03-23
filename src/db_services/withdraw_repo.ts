@@ -84,14 +84,25 @@ export const getAllTransactions = async ({
   const columns = [
     "t.transaction_id",
     "t.amount",
-    "t.transaction_type",
+    // 
     "t.status",
+    "t.mt5_status",
+    "t.payout_status",
+    // 
+    "t.admin_message",
+    "t.payout_message",
+    "t.mt5_message",
+    // 
     "t.api_error",
     "t.created_at",
     "t.updated_at",
     "t.is_deleted",
     "t.pg_task",
 
+    "t.dealid",
+    "t.margin",
+    "t.freemargin",
+    "t.equity",
     // customer
     "c.phone_number",
     "c.username",
@@ -101,6 +112,7 @@ export const getAllTransactions = async ({
     "cpm.account_name",
     "cpm.account_number",
     "cpm.ifsc",
+    "cpm.upi_id",
 
     // admin
     "ub.username as updated_by",

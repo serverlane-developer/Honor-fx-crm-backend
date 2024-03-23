@@ -23,6 +23,7 @@ const addTransactionOnMt5 = async (
   transaction_id: string,
   mt5_user_id: string,
   user_id: string,
+  admin_message: string,
   requestId: requestId
 ) => {
   const trx = await knex.transaction();
@@ -50,6 +51,7 @@ const addTransactionOnMt5 = async (
           mt5_message: response.message,
           payout_status: Status.FAILED,
           updated_by: user_id,
+          admin_message,
         },
         { trx }
       );
@@ -70,6 +72,7 @@ const addTransactionOnMt5 = async (
         mt5_message: response.message,
         payout_status: Status.PENDING,
         updated_by: user_id,
+        admin_message,
       },
       { trx }
     );

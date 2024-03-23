@@ -491,6 +491,7 @@ const resolveTransaction = async (req: AdminRequest, res: Response) => {
       transaction_id,
       transaction.mt5_user_id,
       user_id as string,
+      message,
       requestId
     );
     const isSuccess = response.status;
