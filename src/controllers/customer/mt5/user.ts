@@ -6,7 +6,6 @@ import { CustomerRequest } from "../../../@types/Express";
 import validators from "../../../validators";
 import mt5UserHelper from "../../../helpers/mt5User";
 import * as mt5userRepo from "../../../db_services/mt5_user_repo";
-import { decrypt } from "../../../helpers/cipher";
 import { Mt5User } from "../../../@types/database";
 import { count } from "../../../@types/Knex";
 
@@ -81,12 +80,7 @@ const getUserById = async (req: CustomerRequest, res: Response) => {
       });
     }
 
-    const data = {
-      ...userExists,
-      master_password: decrypt(userExists.master_password || ""),
-      investor_password: decrypt(userExists.investor_password || ""),
-    };
-
+    const data = mt5UserHelper.getUser(userExists, "decrypt");
     return res.status(200).json({
       status: true,
       data,
@@ -107,7 +101,7 @@ const getUsers = async (req: CustomerRequest, res: Response) => {
     const limit = Number(qLimit || 0) || 0;
     const skip = Number(qSkip || 0) || 0;
     const status = qStatus === "enable" ? true : false;
-    const list = (await mt5userRepo.getAllMt5Users({ limit, skip, status, customer_id })) as Partial<Mt5User>[];
+    let list = (await mt5userRepo.getAllMt5Users({ limit, skip, status, customer_id })) as Partial<Mt5User>[];
     let count = 0;
 
     if (list?.length) {
@@ -119,6 +113,7 @@ const getUsers = async (req: CustomerRequest, res: Response) => {
         customer_id,
       })) as count;
       count = Number(userCount?.count);
+      list = list.map((user) => mt5UserHelper.getUser(user, "decrypt"));
     }
 
     return res
