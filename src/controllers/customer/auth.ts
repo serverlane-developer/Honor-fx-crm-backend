@@ -321,6 +321,7 @@ const verifyOTP = async (req: Request, res: Response) => {
       const message = "OTP Successfully Verified for New User";
       logger.debug(message, { body, message, requestId });
       cache.put(getRegistrationTokenKey(phone_number), new Date().toISOString());
+      await trx.commit();
       return res.status(200).json({
         status: true,
         message,

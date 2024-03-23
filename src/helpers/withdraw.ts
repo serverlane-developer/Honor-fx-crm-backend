@@ -128,6 +128,7 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
     if (transaction.mt5_status !== Status.SUCCESS) {
       const message = "Transaction is not yet successful on mt5";
       logger.debug(message, { requestId, transaction });
+      await trx.rollback();
       return {
         status: false,
         message,

@@ -46,6 +46,7 @@ const signin = async (req: AdminRequest, res: Response) => {
     if (!userExists) {
       const message = "email or password is Invalid";
       logger.debug(message, { email, requestId });
+      await trx.rollback();
       return res.status(400).json({
         status: false,
         message,
