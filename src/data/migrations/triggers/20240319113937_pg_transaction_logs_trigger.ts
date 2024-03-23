@@ -20,8 +20,6 @@ const columns = [
   "created_at",
   "updated_at",
   "is_deleted",
-  "latest_status",
-  "latest_message",
 ];
 
 const COL_STRING = columns.join(", ");
