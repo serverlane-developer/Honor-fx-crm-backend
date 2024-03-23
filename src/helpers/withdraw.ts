@@ -43,9 +43,11 @@ const addTransactionOnMt5 = async (transaction_id: string, mt5_user_id: string, 
           status: Status.FAILED,
           mt5_status: Status.FAILED,
           mt5_message: response.message,
+          payout_status: Status.FAILED,
         },
         { trx }
       );
+      await trx.commit();
       return { status: false, data: response, message: "Failed to withdraw from Mt5" };
     }
 

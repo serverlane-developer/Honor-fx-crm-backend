@@ -36,6 +36,7 @@ const addTransactionOnMt5 = async (transaction_id: string, mt5_user_id: string, 
         },
         { trx }
       );
+      await trx.commit();
       return { status: false, data: response, message: "Failed to deposit from Mt5" };
     }
 

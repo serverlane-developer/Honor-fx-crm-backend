@@ -157,7 +157,7 @@ const createWithdraw = async (req: CustomerRequest, res: Response) => {
 
     return res.status(200).json({ status: true, message: "Withdraw Created.", data: transaction });
   } catch (err) {
-    if (!trx.isCompleted()) await trx.rollback();
+    await trx.rollback();
     const message = "Error while creating withdraw";
     logger.error(message, { err, customer_id, requestId, body });
     return res.status(500).json({ status: false, message, data: null });
