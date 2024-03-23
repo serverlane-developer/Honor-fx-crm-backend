@@ -608,6 +608,7 @@ const updatePaymentStatus = async (
       : transactionExists.payment_fail_count;
 
     const isProcessing = ["SUCCESS", "PENDING"].includes(paymentStatus);
+    const isSuccess = paymentStatus === "SUCCESS";
 
     let updatedTxn = null;
 
@@ -626,7 +627,8 @@ const updatePaymentStatus = async (
       updatedTxn = await withdrawRepo.updateTransaction(
         { transaction_id },
         {
-          status: isProcessing ? (paymentStatus === "PENDING" ? Status.PROCESSING : Status.SUCCESS) : Status.PENDING,
+          status: isSuccess ? Status.SUCCESS : Status.PROCESSING,
+          payout_status: txnStatus,
           payment_status: paymentStatus,
           payout_message: paymentObj.message,
           api_error: paymentObj.api_error,

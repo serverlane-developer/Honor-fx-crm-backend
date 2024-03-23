@@ -112,7 +112,7 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
       };
     }
 
-    if (transaction?.status !== "pending" || transaction?.pg_task !== false || transaction?.pg_order_id) {
+    if (transaction?.payout_status !== "pending" || transaction?.pg_task !== false || transaction?.pg_order_id) {
       const message = "Looks like Transaction is already on gateway";
       logger.debug(message, { message, requestId });
       await trx.rollback();
@@ -243,6 +243,7 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
         },
         {
           status: Status.PROCESSING,
+          payout_status: Status.PROCESSING,
           payment_status: transferRes.payment_status,
           pg_order_id,
           pg_id,
@@ -270,7 +271,8 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
       const updatedTxn = await withdrawRepo.updateTransaction(
         { transaction_id },
         {
-          status: Status.PENDING,
+          status: Status.PROCESSING,
+          payout_status: Status.PENDING,
           payment_fail_count: Number(transaction.payment_fail_count || 0) + 1,
           pg_task: false,
           api_error: transferRes.message,
@@ -307,6 +309,7 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
         { transaction_id },
         {
           status: Status.PROCESSING,
+          payout_status: Status.PENDING,
           api_error: message + `\nFailed on Payment Gateway | Request Id: ${requestId}`,
           pg_task: true,
           pg_order_id,
