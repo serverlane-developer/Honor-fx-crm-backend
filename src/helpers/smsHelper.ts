@@ -23,7 +23,7 @@ const sendOTPSms = async (phone_number: string, otp: string, requestId: requestI
     const params = {
       authkey: config.SMS_AUTH_KEY,
       mobiles: number,
-      message: encodeURI(template),
+      message: template,
       sender: config.SMS_SENDER,
       route: config.SMS_ROUTE,
       country: countryCode,
