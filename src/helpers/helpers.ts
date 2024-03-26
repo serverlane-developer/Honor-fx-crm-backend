@@ -16,7 +16,11 @@ const getResetTokenKey = (token: string, email: string) => {
 };
 
 const getRandomNumber = (length: number = 6): string =>
-  String(Math.floor(Math.random() * Number(`${9}${"0".repeat(length)}`)) + Number(`${1}${"0".repeat(length)}`));
+  length > 0
+    ? String(
+        Math.floor(Math.random() * Number(`${9}${"0".repeat(length - 1)}`)) + Number(`${1}${"0".repeat(length - 1)}`)
+      )
+    : "";
 
 const getIp = (req: Request) => {
   if (!req) throw new Error("Request data is required to get IP");
