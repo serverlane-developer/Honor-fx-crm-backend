@@ -6,16 +6,19 @@ import { AdminRequest } from "../../@types/Express";
 import validators from "../../validators";
 
 import logger from "../../utils/logger";
-import { Deposit, Customer } from "../../@types/database";
+import { Deposit, Customer, CustomerLoginLog } from "../../@types/database";
 import { count } from "../../@types/Knex";
 
 import * as depositRepo from "../../db_services/deposit_repo";
 import * as customerRepo from "../../db_services/customer_repo";
 import * as withdrawRepo from "../../db_services/withdraw_repo";
+import * as customerLoginLogRepo from "../../db_services/customer_login_log_repo";
+
 import { decrypt } from "../../helpers/cipher";
 import { Status } from "../../@types/Common";
 import { WithdrawList } from "../../@types/database/Withdraw";
 import { CustomerTransactions } from "../../@types/database/Customer";
+import helpers from "../../helpers/helpers";
 
 const getCustomerById = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params } = req;
@@ -50,11 +53,15 @@ const getCustomerById = async (req: AdminRequest, res: Response) => {
       total_deposit_amount: depositTxns.reduce((accumulator, transaction) => {
         return accumulator + Number(transaction.amount);
       }, 0),
+      pin: undefined,
+      created_by: undefined,
+      is_deleted: undefined,
+      updated_by: undefined,
     };
 
     return res.status(200).json({
       status: true,
-      data: customerProfile,
+      data: JSON.parse(JSON.stringify(customerProfile)),
       message: `Customer Fetched`,
     });
   } catch (err) {
@@ -281,9 +288,86 @@ const getDetailedTransaction = async (req: AdminRequest, res: Response) => {
   }
 };
 
+const getLoginHistory = async (req: AdminRequest, res: Response) => {
+  const { query, requestId, user_id, params } = req;
+  try {
+    const { customer_id } = params;
+    const { limit: qLimit, skip: qSkip } = query;
+    const limit = Number(qLimit || 0) || 0;
+    const skip = Number(qSkip || 0) || 0;
+
+    if (!user_id) {
+      return res.status(400).json({
+        status: false,
+        message: "User ID is required to get Login History",
+        data: [],
+      });
+    }
+
+    const validator = validators.common.uuid.required().validate(customer_id);
+    if (validator.error) {
+      const message = validator.error.message;
+      logger.debug("Invalid Customer ID", { requestId, params, user_id, query });
+      return res.status(400).json({
+        status: false,
+        message,
+        data: null,
+      });
+    }
+
+    const customer = await customerRepo.getCustomerById(customer_id);
+    if (!customer) {
+      const message = "Customer not found!";
+      logger.debug(message, { message, requestId, params, user_id, query });
+      return res.status(400).json({
+        status: false,
+        message,
+        data: null,
+      });
+    }
+
+    let history = (await customerLoginLogRepo.getLoginHistory({
+      customer_id,
+      limit,
+      skip,
+      totalRecords: false,
+    })) as Partial<CustomerLoginLog>[];
+
+    let count = 0;
+    if (history?.length) {
+      const allHistoryCount = (await customerLoginLogRepo.getLoginHistory({
+        customer_id,
+        limit: null,
+        skip: null,
+        totalRecords: true,
+      })) as count;
+      count = Number(allHistoryCount?.count);
+      history = history.map((x) => ({
+        ...x,
+        device: x.login_device ? helpers.parseDeviceDetails(x.login_device) : null,
+      }));
+    }
+
+    return res
+      .header("Access-Control-Expose-Headers", "x-total-count")
+      .setHeader("x-total-count", count)
+      .status(200)
+      .json({
+        status: true,
+        message: "Login History Fetched",
+        data: history,
+      });
+  } catch (err) {
+    const message = "Error while fetching login history";
+    logger.error(message, { err, user_id, requestId });
+    return res.status(500).json({ status: false, message, data: null });
+  }
+};
+
 export default {
   getCustomerById,
   getCustomers,
   getCustomerTransactions,
   getDetailedTransaction,
+  getLoginHistory,
 };

@@ -41,7 +41,21 @@ export const getAllCustomers = async ({
     }
     return countQuery;
   }
-  const columns = ["c.*"];
+  const columns = [
+    "customer_id",
+    "username",
+    "email",
+    "phone_number",
+    "pin_changed_at",
+    // "is_2fa_enabled",
+    // "two_factor_toggled_at",
+    "last_login_ip",
+    "last_login_at",
+    "created_by",
+    "created_at",
+    "updated_at",
+    "is_deleted",
+  ];
   let query = knexRead(`${tablename} as c`).select(columns).orderBy("c.created_at", "desc");
 
   if (search) {
