@@ -259,8 +259,59 @@ export const getCustomerTransactions = async ({
 };
 
 export const getTotalTransactions = (customer_id: string) => {
-  const columns = [knexRead.raw("count(transaction_id) as count"), knexRead.raw(" COALESCE(sum(amount::numeric), 0) as sum")];
+  const columns = [
+    knexRead.raw("count(transaction_id) as count"),
+    knexRead.raw(" COALESCE(sum(amount::numeric), 0) as sum"),
+  ];
   const query = knexRead(tablename).select(columns).where({ customer_id, status: Status.SUCCESS }).first();
   // console.log(query.toString());
+  return query;
+};
+
+export const getDetailedTransactionByFilter = async (filter: { transaction_id: string }): Promise<Deposit | null> => {
+  const columns = [
+    "t.transaction_id",
+    "t.amount",
+    "t.transaction_type",
+
+    "t.utr_id",
+
+    "t.dealid",
+    "t.margin",
+    "t.freemargin",
+    "t.equity",
+    //
+    "t.status",
+    "t.mt5_status",
+    "t.payin_status",
+    //
+    "t.admin_message",
+    "t.payin_message",
+    "t.mt5_message",
+    //
+
+    "t.created_at",
+    "t.updated_at",
+
+    // admin
+    "cb.username",
+    "cb.phone_number",
+    "ub.username as updated_by",
+
+    "t.ip",
+
+    "t.pg_id",
+    "pg.pg_label",
+    "pg.nickname",
+  ];
+
+  const query = knexRead(`${tablename} as t`)
+    .select(columns)
+    .where(filter)
+    .join("customer as cb", "t.customer_id", "cb.customer_id")
+    .leftJoin("admin_user as ub", "t.updated_by", "ub.user_id")
+    .leftJoin("payin_gateway as pg", "t.pg_id", "pg.pg_id")
+    .first();
+
   return query;
 };

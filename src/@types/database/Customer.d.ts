@@ -28,4 +28,14 @@ interface Customer {
   is_deleted: boolean;
 }
 
+export type CustomerTransactions = {
+  transaction_id: string;
+  amount: string;
+  created_at: string;
+  updated_at: string;
+  status: string;
+  pg_task: string;
+  transaction_type: "withdraw" | "deposit";
+};
+
 export default Customer;

@@ -52,6 +52,28 @@ interface Withdraw {
   pg_order_id: string | null;
 }
 
+export interface WithdrawList extends Withdraw {
+  username: string;
+  phoner_number: string;
+  updated_by: string;
+
+  bank_name: string;
+  account_name: string;
+  account_number: string;
+  ifsc: string;
+  upi_id: string;
+
+  pg_order_id: string;
+  payment_status: string;
+  payment_fail_count: string;
+  payment_req_method: string;
+  utr_id: string;
+  payment_creation_date: string;
+  payment_order_id: string;
+  pg_label: string;
+  nickname: string;
+}
+
 export { Status, transaction_status, PaymentMethod, payment_req_method };
 
 export default Withdraw;

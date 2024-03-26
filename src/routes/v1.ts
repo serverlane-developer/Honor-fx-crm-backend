@@ -9,16 +9,19 @@ import customerRoutes from "./customer";
 import paymentGatewayRoutes from "./payment_gateway";
 import webhookRoutes from "./webhook";
 import transactionRouter from "./transaction";
+import usersRouter from "./users";
 
 const router = express.Router();
 
+// backoffice routes
 router.use("/admin", adminRoutes);
 router.use("/modules", [auth], moduleRoutes);
 router.use("/roles", [auth], roleRoutes);
 router.use("/paymentGateway", [auth], paymentGatewayRoutes);
 router.use("/transaction", [auth], transactionRouter);
+router.use("/users", [auth], usersRouter);
 
-// customer
+// frontend routes
 router.use("/customer", customerRoutes);
 
 // webhook for external apis

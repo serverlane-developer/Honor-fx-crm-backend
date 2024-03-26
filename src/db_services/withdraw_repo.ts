@@ -7,7 +7,7 @@ import { Withdraw } from "../@types/database";
 import { knex, knexRead } from "../data/knex";
 
 import { PaginationParams } from "../@types/Common";
-import { Status } from "../@types/database/Withdraw";
+import { Status, WithdrawList } from "../@types/database/Withdraw";
 
 const tablename = "withdraw";
 
@@ -212,24 +212,43 @@ export const getTransactionHistory = ({ id, skip, limit, totalRecords }: Paginat
 
 export const getDetailedTransactionByFilter = async (filter: {
   transaction_id: string;
-  "t.username": string;
-}): Promise<Withdraw | null> => {
+}): Promise<WithdrawList | null> => {
   const columns = [
     "t.transaction_id",
-    "t.username",
     "t.amount",
-    "t.date",
     "t.transaction_type",
+    //
     "t.status",
+    "t.mt5_status",
+    "t.payout_status",
+    //
+    "t.admin_message",
+    "t.payout_message",
+    "t.mt5_message",
+    //
     "t.api_error",
+
     "t.created_at",
     "t.updated_at",
     "t.is_deleted",
+
     "t.pg_task",
 
+    "t.dealid",
+    "t.margin",
+    "t.freemargin",
+    "t.equity",
+
     // admin
-    "cb.username as created_by",
+    "c.username",
+    "c.phone_number",
     "ub.username as updated_by",
+
+    "cpm.bank_name",
+    "cpm.account_name",
+    "cpm.account_number",
+    "cpm.ifsc",
+    "cpm.upi_id",
 
     // pg related
     "t.pg_order_id",
@@ -251,9 +270,10 @@ export const getDetailedTransactionByFilter = async (filter: {
   const query = knexRead(`${tablename} as t`)
     .select(columns)
     .where(filter)
-    .join("customer as cb", "t.customer_id", "cb.customer_id")
-    .join("admin_user as ub", "t.updated_by", "ub.user_id")
-    .leftJoin("payout_gateway as pg", "t.pg_id", "pg.pg_id")
+    .join("customer as c", "t.customer_id", "c.customer_id")
+    .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
+    .join("payout_gateway as pg", "pg.pg_id", "t.pg_id")
+    .leftJoin("admin_user as ub", "t.updated_by", "ub.user_id")
     .first();
   // console.log(query.toString());
   return query;
@@ -372,7 +392,10 @@ export const getCustomerTransactions = async ({
 };
 
 export const getTotalTransactions = (customer_id: string) => {
-  const columns = [knexRead.raw("count(transaction_id) as count"), knexRead.raw("COALESCE(sum(amount::numeric), 0) as sum")];
+  const columns = [
+    knexRead.raw("count(transaction_id) as count"),
+    knexRead.raw("COALESCE(sum(amount::numeric), 0) as sum"),
+  ];
 
   const query = knexRead(tablename).select(columns).where({ customer_id, status: Status.SUCCESS }).first();
   // console.log(query.toString());

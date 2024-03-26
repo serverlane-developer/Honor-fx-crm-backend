@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 const table_name = "modules";
 
 export async function seed(knex: Knex) {
-  const modulesNames = ["modules", "roles", "admin", "payment gateway", "transaction", "customer"];
+  const modulesNames = ["modules", "roles", "admin", "payment gateway", "transaction", "users"];
 
   const modules = modulesNames.map((module: string) => ({
     module_id: uuidv4(),

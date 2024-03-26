@@ -13,7 +13,7 @@ interface Modules {
   admin: string[];
   "payment gateway": string[];
   transaction: string[];
-  customer: string[];
+  users: string[];
 }
 
 const modules: Modules = {
@@ -22,7 +22,7 @@ const modules: Modules = {
   admin: ["user"],
   "payment gateway": ["payout", "payin"],
   transaction: ["withdraw", "deposit"],
-  customer: ["list"],
+  users: ["management"],
 };
 
 const moduleKeys = Object.keys(modules);

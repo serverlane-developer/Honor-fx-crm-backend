@@ -7,6 +7,7 @@ import { Customer } from "../@types/database";
 import { knex, knexRead } from "../data/knex";
 
 import { PaginationParams } from "../@types/Common";
+import { CustomerTransactions } from "../@types/database/Customer";
 
 const tablename = "customer";
 
@@ -31,18 +32,21 @@ export const getAllCustomers = async ({
   limit,
   skip,
   totalRecords = false,
+  search,
 }: PaginationParams): Promise<Partial<Customer>[] | count> => {
   if (totalRecords) {
-    const countQuery = knexRead(tablename).select(knexRead.raw("count(customer_id) as count")).first();
+    let countQuery = knexRead(tablename).select(knexRead.raw("count(customer_id) as count")).first();
+    if (search) {
+      countQuery = countQuery.whereRaw("c.username iLIKE ? OR c.phone_number iLIKE ?", [`%${search}%`, `%${search}%`]);
+    }
     return countQuery;
   }
-  const columns = ["c.*", "cb.username as created_by", "ub.username as updated_by"];
-  let query = knexRead(`${tablename} as c`)
-    .select(columns)
-    .leftJoin("admin_user as cb", "c.created_by", "cb.customer_id")
-    .leftJoin("admin_user as ub", "c.updated_by", "ub.customer_id")
-    .orderBy("c.updated_at", "desc");
+  const columns = ["c.*"];
+  let query = knexRead(`${tablename} as c`).select(columns).orderBy("c.created_at", "desc");
 
+  if (search) {
+    query = query.whereRaw("c.username iLIKE ? OR c.phone_number iLIKE ?", [`%${search}%`, `%${search}%`]);
+  }
   if (limit) query = query.limit(limit).offset(skip || 0);
   // console.log(query.toString());
   return query;
@@ -79,4 +83,77 @@ export const updateCustomer = async (
 
 export const softDeleteCustomer = async (filter: Partial<Customer>, { trx }: trx = {}): Promise<void> => {
   return (trx || knex)(tablename).returning("*").where(filter).update({ is_deleted: true });
+};
+
+export const getCustomerTransactions = ({
+  limit,
+  skip,
+  totalRecords = false,
+  order = "updated_at",
+  dir = "desc",
+  customer_id,
+  status,
+  type,
+}: PaginationParams): Promise<CustomerTransactions[] | count> => {
+  const commonCols = ["t.transaction_id", "t.amount", "t.created_at", "t.updated_at", "t.status"];
+
+  const allowedTypes = ["withdraw", "deposit"];
+
+  if (type && !allowedTypes.includes(type)) throw new Error("Invalid Transaction Type");
+
+  const withdrawCols = [...commonCols, "pg_task", knexRead.raw("'withdraw' as transaction_type")];
+  const depositCols = [
+    ...commonCols,
+    knexRead.raw("'false' as pg_task"),
+    knexRead.raw("'deposit' as transaction_type"),
+  ];
+
+  const filterObject = {
+    customer_id,
+  };
+
+  const withdrawFilter = {
+    ...filterObject,
+    ...(status && { status }),
+  };
+
+  const depositFilter = {
+    ...filterObject,
+    ...(status && { status }),
+  };
+
+  if (totalRecords) {
+    const col = [knexRead.raw("count(transaction_id) as count")];
+    const withdrawQuery = knexRead("withdraw")
+      .select([...col, knexRead.raw("'withdraw' as type")])
+      .where(withdrawFilter);
+    const depositQuery = knexRead("deposit")
+      .select([...col, knexRead.raw("'deposit' as type")])
+      .where(depositFilter);
+
+    const unionQuery = !type
+      ? knexRead.union([withdrawQuery, depositQuery])
+      : type === "withdraw"
+      ? withdrawQuery
+      : depositQuery;
+    const countQuery = knexRead(unionQuery.as("transactions")).select(knexRead.raw("sum(count) as count")).first();
+    // console.log(countQuery.toString());
+
+    return countQuery;
+  }
+
+  const withdrawQuery = knexRead("withdraw as t").select(withdrawCols).where(withdrawFilter);
+
+  const depositQuery = knexRead("deposit as t").select(depositCols).where(depositFilter);
+
+  let unionQuery = !type
+    ? knexRead.union([withdrawQuery, depositQuery])
+    : type === "withdraw"
+    ? withdrawQuery
+    : depositQuery;
+
+  unionQuery = unionQuery.orderBy(order, dir);
+  if (limit) unionQuery = unionQuery.limit(limit).offset(skip || 0);
+  // console.log(unionQuery.toString());
+  return unionQuery;
 };
