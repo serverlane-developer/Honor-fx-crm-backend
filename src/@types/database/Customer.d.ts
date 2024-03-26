@@ -34,7 +34,6 @@ export type CustomerTransactions = {
   created_at: string;
   updated_at: string;
   status: string;
-  pg_task: string;
   transaction_type: "withdraw" | "deposit";
 };
 

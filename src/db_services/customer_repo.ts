@@ -115,12 +115,8 @@ export const getCustomerTransactions = ({
 
   if (type && !allowedTypes.includes(type)) throw new Error("Invalid Transaction Type");
 
-  const withdrawCols = [...commonCols, "pg_task", knexRead.raw("'withdraw' as transaction_type")];
-  const depositCols = [
-    ...commonCols,
-    knexRead.raw("'false' as pg_task"),
-    knexRead.raw("'deposit' as transaction_type"),
-  ];
+  const withdrawCols = [...commonCols, knexRead.raw("'withdraw' as transaction_type")];
+  const depositCols = [...commonCols, knexRead.raw("'deposit' as transaction_type")];
 
   const filterObject = {
     customer_id,

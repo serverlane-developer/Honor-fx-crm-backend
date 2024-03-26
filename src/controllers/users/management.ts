@@ -6,19 +6,21 @@ import { AdminRequest } from "../../@types/Express";
 import validators from "../../validators";
 
 import logger from "../../utils/logger";
-import { Deposit, Customer, CustomerLoginLog } from "../../@types/database";
+import { Deposit, Customer, CustomerLoginLog, Mt5User } from "../../@types/database";
 import { count } from "../../@types/Knex";
 
 import * as depositRepo from "../../db_services/deposit_repo";
 import * as customerRepo from "../../db_services/customer_repo";
 import * as withdrawRepo from "../../db_services/withdraw_repo";
 import * as customerLoginLogRepo from "../../db_services/customer_login_log_repo";
+import * as mt5UserRepoRepo from "../../db_services/mt5_user_repo";
 
 import { decrypt } from "../../helpers/cipher";
 import { Status } from "../../@types/Common";
 import { WithdrawList } from "../../@types/database/Withdraw";
 import { CustomerTransactions } from "../../@types/database/Customer";
 import helpers from "../../helpers/helpers";
+import mt5UserHelper from "../../helpers/mt5User";
 
 const getCustomerById = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params } = req;
@@ -364,10 +366,75 @@ const getLoginHistory = async (req: AdminRequest, res: Response) => {
   }
 };
 
+const getMt5Users = async (req: AdminRequest, res: Response) => {
+  const { user_id, requestId, params, query } = req;
+  const { customer_id } = params;
+
+  try {
+    const { limit: qLimit, skip: qSkip } = query;
+    const limit = Number(qLimit || 0) || 0;
+    const skip = Number(qSkip || 0) || 0;
+
+    const validator = validators.common.uuid.required().validate(customer_id);
+    if (validator.error) {
+      const message = validator.error.message;
+      logger.debug("Invalid Customer ID", { requestId, params, user_id, query });
+      return res.status(400).json({
+        status: false,
+        message,
+        data: null,
+      });
+    }
+
+    const customer = await customerRepo.getCustomerById(customer_id);
+    if (!customer) {
+      const message = "Customer not found!";
+      logger.debug(message, { message, requestId, params, user_id, query });
+      return res.status(400).json({
+        status: false,
+        message,
+        data: null,
+      });
+    }
+
+    let users = (await mt5UserRepoRepo.getAllMt5Users({
+      limit,
+      skip,
+      customer_id,
+    })) as Mt5User[];
+    let count = 0;
+    if (users?.length) {
+      const transactionsCount = (await mt5UserRepoRepo.getAllMt5Users({
+        limit: null,
+        skip: null,
+        totalRecords: true,
+        customer_id,
+      })) as count;
+      count = Number(transactionsCount?.count || 0);
+      users = users.map((x) => mt5UserHelper.getUser(x, "decrypt"));
+    }
+
+    return res
+      .status(200)
+      .header("Access-Control-Expose-Headers", "x-total-count")
+      .setHeader("x-total-count", count)
+      .json({
+        status: true,
+        message: "Mt5 User Profiles Fetched Successfully",
+        data: { users },
+      });
+  } catch (err) {
+    const message = "Error while getting mt5 user profiles for customer";
+    logger.error(message, { err, user_id, requestId, customer_id });
+    return res.status(500).json({ status: false, message, data: null });
+  }
+};
+
 export default {
   getCustomerById,
   getCustomers,
   getCustomerTransactions,
   getDetailedTransaction,
   getLoginHistory,
+  getMt5Users,
 };
