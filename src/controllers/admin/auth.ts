@@ -11,6 +11,7 @@ import { AdminRequest } from "../../@types/Express";
 import * as adminRepo from "../../db_services/admin_user_repo";
 import * as adminLoginLogRepo from "../../db_services/admin_login_log_repo";
 import * as accessControlRepo from "../../db_services/access_control_repo";
+import * as roleRepo from "../../db_services/roles_repo";
 
 import helpers from "../../helpers/helpers";
 import otpHelper from "../../helpers/otp";
@@ -19,6 +20,7 @@ import AdminUser from "../../@types/database/AdminUser";
 import { knex } from "../../data/knex";
 import mailHelper from "../../helpers/mailHelper";
 import { getAdminJwtToken as getJwtToken } from "../../helpers/login";
+import { Role } from "../../@types/database";
 
 const signin = async (req: AdminRequest, res: Response) => {
   const { body, requestId } = req;
@@ -81,8 +83,16 @@ const signin = async (req: AdminRequest, res: Response) => {
       });
     }
 
+    const role = (await roleRepo.getRoleById(userExists.role_id)) as Role;
+
     if (!userExists.is_2fa_enabled) {
-      const { token: jwtToken, data: resData } = getJwtToken(user_id, email, username, two_factor_authenticated);
+      const { token: jwtToken, data: resData } = getJwtToken(
+        user_id,
+        email,
+        username,
+        two_factor_authenticated,
+        role.role_name
+      );
 
       await adminRepo.updateAdmin(
         { user_id },
@@ -408,8 +418,15 @@ const verifyOtp = async (req: AdminRequest, res: Response) => {
       },
       { trx }
     );
+    const role = (await roleRepo.getRoleById(adminDetails.role_id)) as Role;
 
-    const { token: jwtToken, data: resData } = getJwtToken(user_id, email, username, two_factor_authenticated);
+    const { token: jwtToken, data: resData } = getJwtToken(
+      user_id,
+      email,
+      username,
+      two_factor_authenticated,
+      role.role_name
+    );
 
     const access_rights = await accessControlRepo.getAccessControlModulesByRoleId(adminDetails.role_id);
 
@@ -571,8 +588,9 @@ const updatePassword = async (req: AdminRequest, res: Response) => {
     const { username, email, is_2fa_enabled } = user;
 
     await adminRepo.updateAdmin({ user_id }, { password: encPassword, updated_by: user_id });
+    const role = (await roleRepo.getRoleById(user.role_id)) as Role;
 
-    const { token: jwtToken, data: resData } = getJwtToken(user_id, email, username, is_2fa_enabled);
+    const { token: jwtToken, data: resData } = getJwtToken(user_id, email, username, is_2fa_enabled, role.role_name);
 
     return res.status(200).header("Access-Control-Expose-Headers", "token").setHeader("token", jwtToken).json({
       status: true,
@@ -851,7 +869,9 @@ const confirm2faToggle = async (req: AdminRequest, res: Response) => {
     const message = `2FA has been successfully ${is_enabled ? "enable" : "disable"}d`;
     await adminRepo.updateAdmin({ user_id }, { is_2fa_enabled: is_enabled });
 
-    const { token: jwtToken, data: resData } = getJwtToken(user_id, email, user.username, is_enabled);
+    const role = (await roleRepo.getRoleById(user.role_id)) as Role;
+
+    const { token: jwtToken, data: resData } = getJwtToken(user_id, email, user.username, is_enabled, role?.role_name);
     return res.status(200).header("Access-Control-Expose-Headers", "token").setHeader("token", jwtToken).json({
       status: true,
       message,

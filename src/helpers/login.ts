@@ -1,7 +1,13 @@
 import jwt from "jsonwebtoken";
 import config from "../config";
 
-const getAdminJwtToken = (user_id: string, email: string, username: string, is_2fa_enabled: boolean) => {
+const getAdminJwtToken = (
+  user_id: string,
+  email: string,
+  username: string,
+  is_2fa_enabled: boolean,
+  role_name: string
+) => {
   const token = jwt.sign(
     {
       id: user_id,
@@ -19,6 +25,7 @@ const getAdminJwtToken = (user_id: string, email: string, username: string, is_2
     email,
     username,
     user_id,
+    role_name,
   };
   return { token, data };
 };
