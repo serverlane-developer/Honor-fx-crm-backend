@@ -15,6 +15,8 @@ import PayinGateway from "./PayinGateway";
 import Deposit from "./Deposit";
 import Mt5User from "./Mt5User";
 
+import Referral from "./Referral";
+
 export {
   AdminUser,
   AdminLoginLog,
@@ -31,4 +33,5 @@ export {
   PayinGateway,
   Deposit,
   Mt5User,
+  Referral,
 };

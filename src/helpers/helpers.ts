@@ -58,6 +58,47 @@ const getRandomMobileNumber = () => {
 
 const getRandomId = (length = 16) => crypto.randomBytes((length && length > 2 ? length : 2) / 2).toString("hex");
 
+const generatePassword = (length = 8, { upper = true, special = true, num = true, lower = true } = {}) => {
+  const charset = lower ? "abcdefghijklmnopqrstuvwxyz" : "";
+  const caps = upper ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ" : "";
+  const nums = num ? "0123456789" : "";
+  const specials = special ? (typeof special === "boolean" ? "@#$&" : typeof special === "string" ? special : "") : "";
+  let password = "";
+
+  const applied = {
+    upper: false,
+    lower: false,
+    special: false,
+    num: false,
+  };
+
+  const str = charset + caps + nums + specials;
+
+  if (str.length < length)
+    throw new Error(
+      `Password conditions restriciting characters for use\nCurrently only these character can be used "${str}".\nPlease allow more characters to be used for generating password `
+    );
+
+  for (let i = 0; i < length; ++i) {
+    if (upper && !applied.upper) {
+      password += caps.charAt(Math.floor(Math.random() * caps.length));
+      applied.upper = true;
+    } else if (num && !applied.num) {
+      password += nums.charAt(Math.floor(Math.random() * nums.length));
+      applied.num = true;
+    } else if (special && !applied.special) {
+      password += specials.charAt(Math.floor(Math.random() * specials.length));
+      applied.special = true;
+    } else if (lower && !applied.lower) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+      applied.lower = true;
+    } else {
+      password += str.charAt(Math.floor(Math.random() * str.length));
+    }
+  }
+  return password;
+};
+
 export default {
   getResetTokenKey,
   getAdminResetPasswordURL,
@@ -67,4 +108,5 @@ export default {
   parseDeviceDetails,
   getRandomMobileNumber,
   getRandomId,
+  generatePassword,
 };

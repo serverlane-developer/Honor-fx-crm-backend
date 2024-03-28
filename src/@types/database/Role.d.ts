@@ -1,6 +1,6 @@
 interface Role {
   role_id: string;
-  role_name: string;
+  role_name: "Super Admin" | "Telecaller" | string;
   created_by: string | null;
   updated_by: string | null;
   created_at: string;

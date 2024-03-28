@@ -1,26 +1,9 @@
 import { Knex } from "knex";
 
-const TABLE_NAME = "customer";
+const TABLE_NAME = "referral";
 const LOG_TABLE_NAME = `${TABLE_NAME}_logs`;
 
-const columns = [
-  "customer_id",
-  "email",
-  "phone_number",
-  "username",
-  "is_image_uploaded",
-  "pin",
-  "is_pin_reset_required",
-  "pin_changed_at",
-  "is_2fa_enabled",
-  "two_factor_toggled_at",
-  "created_by",
-  "updated_by",
-  "created_at",
-  "updated_at",
-  "is_deleted",
-  "referral_id",
-];
+const columns = ["referral_id", "referral_code", "created_at", "updated_at", "is_deleted", "user_id", "updated_by"];
 
 const COL_STRING = columns.join(", ");
 const OLD_COL_STRING = columns.map((col) => `OLD.${col}`).join(", ");
@@ -41,7 +24,7 @@ export async function up(knex: Knex): Promise<void> {
   LANGUAGE 'plpgsql';
   /* create trigger */
   CREATE TRIGGER ${LOG_TABLE_NAME}_trigger
-  AFTER UPDATE OF ${COL_STRING} ON ${TABLE_NAME}
+  AFTER UPDATE ON ${TABLE_NAME}
   FOR EACH ROW
   EXECUTE PROCEDURE ${TABLE_NAME}_update_log();`;
   return await knex.raw(query);
