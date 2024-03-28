@@ -160,7 +160,7 @@ const addTransactionOnGateway = async (transaction_id: string, requestId: reques
         data: null,
       };
     }
-    const decryptedPaymentMethod = getPaymentMethod(customerPaymentMethod, "decrypt");
+    const decryptedPaymentMethod = getPaymentMethod(transaction, "decrypt");
 
     const amount = Number(transaction?.amount);
 

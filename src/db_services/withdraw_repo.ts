@@ -108,11 +108,11 @@ export const getAllTransactions = async ({
     "c.username as created_by",
 
     // customer payment methods
-    "cpm.bank_name",
-    "cpm.account_name",
-    "cpm.account_number",
-    "cpm.ifsc",
-    "cpm.upi_id",
+    "t.bank_name",
+    "t.account_name",
+    "t.account_number",
+    "t.ifsc",
+    "t.upi_id",
 
     // admin
     "ub.username as updated_by",
@@ -135,7 +135,6 @@ export const getAllTransactions = async ({
     .select(columns)
     .where({ status })
     .join("customer as c", "t.customer_id", "c.customer_id")
-    .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
     .leftJoin("admin_user as ub", "t.updated_by", "ub.user_id")
     .orderBy(`t.${order}`, dir);
 
@@ -244,11 +243,11 @@ export const getDetailedTransactionByFilter = async (filter: {
     "c.phone_number",
     "ub.username as updated_by",
 
-    "cpm.bank_name",
-    "cpm.account_name",
-    "cpm.account_number",
-    "cpm.ifsc",
-    "cpm.upi_id",
+    "t.bank_name",
+    "t.account_name",
+    "t.account_number",
+    "t.ifsc",
+    "t.upi_id",
 
     // pg related
     "t.pg_order_id",
@@ -271,7 +270,7 @@ export const getDetailedTransactionByFilter = async (filter: {
     .select(columns)
     .where(filter)
     .join("customer as c", "t.customer_id", "c.customer_id")
-    .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
+    // .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
     .join("payout_gateway as pg", "pg.pg_id", "t.pg_id")
     .leftJoin("admin_user as ub", "t.updated_by", "ub.user_id")
     .first();
@@ -352,10 +351,10 @@ export const getCustomerTransactions = async ({
     "c.username",
 
     // customer payment methods
-    "cpm.bank_name",
-    "cpm.account_name",
-    "cpm.account_number",
-    "cpm.ifsc",
+    "t.bank_name",
+    "t.account_name",
+    "t.account_number",
+    "t.ifsc",
   ];
   if (showPgColumns) {
     columns.push("t.pg_order_id");
@@ -376,7 +375,7 @@ export const getCustomerTransactions = async ({
     .where(filter)
     .join("customer as c", "t.customer_id", "c.customer_id")
     // .leftJoin("admin_user as ub", "t.updated_by", "ub.user_id")
-    .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
+    // .join("customer_payment_method as cpm", "t.payment_method_id", "cpm.payment_method_id")
     .orderBy(`t.${order}`, dir);
 
   if (showPgColumns) {

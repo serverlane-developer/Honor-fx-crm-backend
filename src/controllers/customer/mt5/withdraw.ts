@@ -12,7 +12,7 @@ import * as mt5UserRepo from "../../../db_services/mt5_user_repo";
 
 import validators from "../../../validators";
 import { knex } from "../../../data/knex";
-import { Withdraw } from "../../../@types/database";
+import { CustomerPaymentMethod, Withdraw } from "../../../@types/database";
 import helpers from "../../../helpers/helpers";
 import { Status } from "../../../@types/database/Withdraw";
 import { getPaymentMethod } from "../../../helpers/paymentMethodHelper";
@@ -123,6 +123,17 @@ const createWithdraw = async (req: CustomerRequest, res: Response) => {
       });
     }
 
+    const paymentInfoObj = {
+      payment_method: paymentMethod.payment_method,
+      account_number: paymentMethod.account_number,
+      ifsc: paymentMethod.ifsc,
+      bank_name: paymentMethod.bank_name,
+      account_name: paymentMethod.account_name,
+      upi_id: paymentMethod.upi_id,
+    };
+
+    const encryptedPaymentInfo = getPaymentMethod(paymentInfoObj, "encrypt") as Partial<CustomerPaymentMethod>;
+
     const transaction_id = v4();
     const transaction: Partial<Withdraw> = {
       amount,
@@ -135,6 +146,7 @@ const createWithdraw = async (req: CustomerRequest, res: Response) => {
       pg_id,
       payment_method_id,
       mt5_user_id,
+      ...encryptedPaymentInfo,
     };
 
     await withdrawRepo.createTransaction(transaction, transaction_id, { trx });

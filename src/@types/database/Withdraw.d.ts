@@ -1,4 +1,5 @@
 import { Status, mt5_status, transaction_status } from "../Common";
+import { payment_method } from "./CustomerPaymentMethod";
 
 const enum PaymentMethod {
   IMPS = "IMPS",
@@ -50,6 +51,14 @@ interface Withdraw {
   payment_order_id: string | null;
   pg_task: boolean;
   pg_order_id: string | null;
+
+  // customer's payment info
+  payment_method: payment_method;
+  account_number: string;
+  ifsc: string;
+  bank_name: string;
+  account_name: string;
+  upi_id: string;
 }
 
 export interface WithdrawList extends Withdraw {
