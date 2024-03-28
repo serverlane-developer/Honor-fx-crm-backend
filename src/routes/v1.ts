@@ -10,6 +10,7 @@ import paymentGatewayRoutes from "./payment_gateway";
 import webhookRoutes from "./webhook";
 import transactionRouter from "./transaction";
 import usersRouter from "./users";
+import referralRouter from "./referral";
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.use("/roles", [auth], roleRoutes);
 router.use("/paymentGateway", [auth], paymentGatewayRoutes);
 router.use("/transaction", [auth], transactionRouter);
 router.use("/users", [auth], usersRouter);
+router.use("/referral", [auth], referralRouter);
 
 // frontend routes
 router.use("/customer", customerRoutes);

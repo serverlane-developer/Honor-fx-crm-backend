@@ -38,6 +38,8 @@ const paymentReqMethod = joi.string().valid("IMPS", "NEFT");
 
 const pin = number.length(4);
 
+const referralCode = joi.string().alphanum().case("upper").min(4).max(12);
+
 export default {
   username,
   password,
@@ -55,4 +57,5 @@ export default {
   paymentReqMethod,
   isFlagged,
   pin,
+  referralCode,
 };

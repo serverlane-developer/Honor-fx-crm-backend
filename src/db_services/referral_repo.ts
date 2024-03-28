@@ -108,7 +108,7 @@ export const getCustomersByReferralId = ({
   to_date,
   totalRecords = false,
   referral_id,
-}: PaginationParams) => {
+}: PaginationParams): Promise<Referral[] | count> => {
   const columns = ["c.customer_id", "c.username", "c.phone_number", "c.last_login_at", "c.created_at"];
 
   let query = knexRead(`customer as c`);
