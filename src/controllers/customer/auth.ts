@@ -25,12 +25,12 @@ const getRegistrationTokenKey = (phone_number: string) => phone_number + "_regis
 
 const sendOTP = async (req: Request, res: Response) => {
   const { body, requestId } = req;
-  const { phone_number } = body;
   const ip = helpers.getIp(req);
   const login_device = helpers.getDeviceDetails(req);
   let customer_id, two_factor_authenticated;
   const trx = await knex.transaction();
   try {
+    const { phone_number } = body;
     const isPhoneValid = libphonenumber.isValidPhoneNumber(phone_number);
     if (!isPhoneValid) {
       const message = "Invalid Phone Number";
@@ -163,12 +163,12 @@ const sendOTP = async (req: Request, res: Response) => {
 
 const verifyOTP = async (req: Request, res: Response) => {
   const { body, requestId } = req;
-  const { phone_number, token } = body;
   const ip = helpers.getIp(req);
   const login_device = helpers.getDeviceDetails(req);
   let customer_id, two_factor_authenticated;
   const trx = await knex.transaction();
   try {
+    const { phone_number, token } = body;
     const isPhoneValid = libphonenumber.isValidPhoneNumber(phone_number);
     if (!isPhoneValid) {
       const message = "Invalid Phone Number";
@@ -404,12 +404,12 @@ const verifyOTP = async (req: Request, res: Response) => {
 
 const resendOTP = async (req: Request, res: Response) => {
   const { body, requestId } = req;
-  const { phone_number } = body;
   const ip = helpers.getIp(req);
   const login_device = helpers.getDeviceDetails(req);
   let customer_id;
   let two_factor_authenticated;
   try {
+    const { phone_number } = body;
     const isValid = libphonenumber.isValidPhoneNumber(phone_number || "");
     if (!isValid) {
       const message = `Invalid Phone Number.`;

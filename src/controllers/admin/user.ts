@@ -203,10 +203,10 @@ const updateAdmin = async (req: AdminRequest, res: Response) => {
 const deleteAdmin = async (req: AdminRequest, res: Response) => {
   const { user_id: updated_by, requestId, params, body } = req;
   const { user_id } = params;
-  const { is_deleted }: { is_deleted: boolean } = body;
-  const operation = is_deleted ? "disabled" : "enabled";
 
   try {
+    const { is_deleted }: { is_deleted: boolean } = body;
+    const operation = is_deleted ? "disabled" : "enabled";
     const validator = validators.common.isDeleted.required().validate({ id: user_id, is_deleted });
     if (validator.error) {
       return res.status(400).json({

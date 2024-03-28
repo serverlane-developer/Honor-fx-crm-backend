@@ -256,10 +256,10 @@ const getRoles = async (req: AdminRequest, res: Response) => {
 const deleteRole = async (req: AdminRequest, res: Response) => {
   const { user_id, requestId, params, body } = req;
   const { role_id } = params;
-  const { is_deleted }: { is_deleted: boolean } = body;
-  const operation = is_deleted ? "disabled" : "enabled";
 
   try {
+    const { is_deleted }: { is_deleted: boolean } = body;
+    const operation = is_deleted ? "disabled" : "enabled";
     const validator = validators.common.isDeleted.required().validate({ id: role_id, is_deleted });
     if (validator.error) {
       return res.status(400).json({

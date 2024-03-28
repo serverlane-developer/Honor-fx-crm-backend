@@ -280,8 +280,9 @@ const getPaymentHistory = async (req: AdminRequest, res: Response) => {
 
 const updateMultiplePaymentStatus = async (req: AdminRequest, res: Response) => {
   const { body, requestId, user_id } = req;
-  const { pg_order_ids } = body;
   try {
+    const { pg_order_ids } = body;
+
     if (!(pg_order_ids || []).filter((x: string) => x).length) {
       const message = "Pg Order Ids are required to update status";
       return res.status(400).json({
