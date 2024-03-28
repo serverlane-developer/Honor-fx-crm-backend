@@ -54,11 +54,10 @@ export const getAllReferrals = async ({
     "r.is_deleted",
     "r.created_at",
     "r.updated_at",
-    "cb.username as created_by",
+    "cb.username",
+    "cb.email",
     "ub.username as updated_by",
-    knexRead.raw(
-      "(select count(*) from customers as c where c.referral_id = r.referral_id limit 1)  as customer_count"
-    ),
+    knexRead.raw("(select count(*) from customer as c where c.referral_id = r.referral_id limit 1)  as customer_count"),
   ];
   let query = knexRead(`${tablename} as r`)
     .select(columns)
@@ -119,6 +118,7 @@ export const getCustomersByReferralId = ({
       countQuery = countQuery.whereRaw(`c.phone_number LIKE ?`, [searchText]);
     }
     countQuery = countQuery.first();
+    // console.log(countQuery.toString());
     return countQuery;
   }
 
@@ -134,6 +134,5 @@ export const getCustomersByReferralId = ({
 
   if (limit) query = query.limit(limit).offset(skip || 0);
   // console.log(query.toString());
-
   return query;
 };

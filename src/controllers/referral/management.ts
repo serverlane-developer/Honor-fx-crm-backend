@@ -96,7 +96,7 @@ const updateReferralCode = async (req: AdminRequest, res: Response) => {
       });
     }
 
-    if (!role_created_by && params.user_id) {
+    if (role_created_by && params.user_id) {
       await trx.rollback();
       const message = "Only Super admins are allowed to edit other referral codes";
       return res.status(400).json({
@@ -155,7 +155,7 @@ const getReferralList = async (req: AdminRequest, res: Response) => {
   const { requestId, query, role_created_by } = req;
 
   try {
-    if (!role_created_by) {
+    if (role_created_by) {
       return res.status(400).json({
         status: false,
         message: "Only Super admins are allowed to view all referrals!",
@@ -224,20 +224,22 @@ const getCustomersByReferralId = async (req: AdminRequest, res: Response) => {
       });
     }
 
-    const transactions = (await referralRepo.getCustomersByReferralId({
+    const list = (await referralRepo.getCustomersByReferralId({
       limit,
       skip,
       search,
+      referral_id,
     })) as Referral[];
     let count = 0;
-    if (transactions?.length) {
-      const transactionsCount = (await referralRepo.getCustomersByReferralId({
+    if (list?.length) {
+      const listCount = (await referralRepo.getCustomersByReferralId({
         limit: null,
         skip: null,
         totalRecords: true,
         search,
+        referral_id,
       })) as count;
-      count = Number(transactionsCount?.count || 0);
+      count = Number(listCount?.count || 0);
     }
 
     return res
@@ -246,11 +248,11 @@ const getCustomersByReferralId = async (req: AdminRequest, res: Response) => {
       .setHeader("x-total-count", count)
       .json({
         status: true,
-        message: "Customer Refrral List Fetched Successfully",
-        data: { transactions },
+        message: "Customer Referral List Fetched Successfully",
+        data: list,
       });
   } catch (err) {
-    const message = "Error while getting Customer Refrral List";
+    const message = "Error while getting Customer Referral List";
     logger.error(message, { err, requestId, params, query, user_id });
     return res.status(500).json({
       status: false,
