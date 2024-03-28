@@ -25,6 +25,9 @@ export async function up(knex: Knex): Promise<void> {
     table.timestamp("last_login_at").nullable().defaultTo(null);
     table.string("last_login_ip").nullable().defaultTo(null);
 
+    // referral
+    table.uuid("referral_id").nullable().references("referral_id").inTable("referral");
+
     // history
     table.uuid("created_by").nullable().references("user_id").inTable("admin_user").onDelete("restrict");
     table.uuid("updated_by").nullable().references("user_id").inTable("admin_user").onDelete("restrict");

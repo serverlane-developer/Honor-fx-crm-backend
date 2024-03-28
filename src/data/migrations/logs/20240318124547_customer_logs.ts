@@ -14,6 +14,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("pin_changed_at");
     table.boolean("is_2fa_enabled");
     table.string("two_factor_toggled_at");
+    table.string("referral_id");
     table.string("created_by");
     table.string("updated_by");
     table.string("created_at");

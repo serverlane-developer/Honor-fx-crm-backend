@@ -14,12 +14,12 @@ const columns = [
   "pin_changed_at",
   "is_2fa_enabled",
   "two_factor_toggled_at",
+  "referral_id",
   "created_by",
   "updated_by",
   "created_at",
   "updated_at",
   "is_deleted",
-  "referral_id",
 ];
 
 const COL_STRING = columns.join(", ");
