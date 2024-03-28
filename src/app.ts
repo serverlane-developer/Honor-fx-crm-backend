@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { Application, NextFunction, Response } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import useragent from "express-useragent";
@@ -9,6 +9,8 @@ import assignId from "./middleware/assignId";
 
 import healthRoute from "./routes/health";
 import routes from "./routes";
+import logger from "./utils/logger";
+import { Request } from "./@types/Express";
 
 const app: Application = express();
 
@@ -20,8 +22,18 @@ app.enable("trust proxy");
 app.use(helmet());
 app.use(useragent.express());
 
+function handleJsonSyntaxError(err: unknown, req: Request, res: Response, next: NextFunction) {
+  if (err instanceof SyntaxError && "body" in err && "status" in err && err.status === 400) {
+    logger.error("Invalid JSON", { requestId: req.requestId });
+    return res.status(400).json({ status: false, data: null, message: "Invalid JSON" });
+  }
+  next();
+}
+
 // parse json request body
 app.use(express.json());
+
+app.use(handleJsonSyntaxError);
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
