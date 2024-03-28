@@ -4,7 +4,7 @@ import validators from "./common";
 const newUserValidator = Joi.object({
   email: validators.email.optional(),
   phone_number: validators.phone.required(),
-  username: validators.username.required(),
+  username: validators.fullname.required(),
   pin: validators.pin.required(),
   referral_code: validators.referralCode.optional().allow(""),
   cnf_pin: Joi.ref("pin"),
@@ -36,7 +36,7 @@ const updatePinValidator = Joi.object({
 const updateUserValidation = Joi.object({
   customer_id: validators.uuid.required(),
   email: validators.email.optional(),
-  username: validators.username.required(),
+  username: validators.fullname.required(),
   phone_number: validators.phone.required(),
 });
 

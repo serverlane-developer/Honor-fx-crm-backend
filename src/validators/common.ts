@@ -7,6 +7,7 @@ const passwordRegexMessage =
 
 // common validation
 const username = joi.string().min(3).max(12).pattern(regex.username);
+const fullname = joi.string().min(3).max(50);
 const password = joi.string().pattern(regex.password).message(passwordRegexMessage);
 // const email = joi.string().pattern(regex.email);
 const email = joi.string().email();
@@ -42,6 +43,7 @@ const referralCode = joi.string().alphanum().case("upper").min(4).max(12);
 
 export default {
   username,
+  fullname,
   password,
   email,
   uuid,
