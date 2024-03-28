@@ -90,7 +90,7 @@ export const softDeleteReferral = async (filter: Partial<Referral>, { trx }: trx
 
 export const getUniqueReferralCode = async ({ trx }: trx = {}, retry: number = 0): Promise<string> => {
   if (!trx) throw new Error("Knex Transaction is required");
-  const referral_code = helpers.generatePassword(4, { upper: true, lower: false, num: true, special: false });
+  const referral_code = helpers.generatePassword(4, { upper: true, lower: false, num: false, special: false });
 
   const codeExists = await trx(tablename).select("*").where({ referral_code }).first();
   if (!codeExists) return referral_code;

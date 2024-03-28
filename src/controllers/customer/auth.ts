@@ -7,6 +7,7 @@ import logger from "../../utils/logger";
 import { CustomerRequest, Request } from "../../@types/Express";
 
 import * as customerRepo from "../../db_services/customer_repo";
+import * as referralRepo from "../../db_services/referral_repo";
 import * as customerLoginLogRepo from "../../db_services/customer_login_log_repo";
 
 import helpers from "../../helpers/helpers";
@@ -509,8 +510,15 @@ const register = async (req: Request, res: Response) => {
   const login_device = helpers.getDeviceDetails(req);
   const trx = await knex.transaction();
   try {
-    const { phone_number, pin, email, username, cnf_pin } = body;
-    const validator = validators.customer.newUserValidator.validate({ phone_number, pin, email, username, cnf_pin });
+    const { phone_number, pin, email, username, cnf_pin, referral_code } = body;
+    const validator = validators.customer.newUserValidator.validate({
+      phone_number,
+      pin,
+      email,
+      username,
+      cnf_pin,
+      referral_code,
+    });
     if (validator.error) {
       const message = validator.error.message;
       logger.debug("Validation error while registering customer", { body, message, requestId });
@@ -564,6 +572,24 @@ const register = async (req: Request, res: Response) => {
       });
     }
 
+    let referral_id: string = "";
+    if (referral_code) {
+      const referralCode = await referralRepo.getReferralByFilter({ referral_code }, { trx });
+      if (!referralCode) {
+        const message = `Invalid Referral Code`;
+        logger.debug(message, { requestId, message, body });
+        await trx.rollback();
+        return res.status(400).json({
+          status: false,
+          message,
+          data: {
+            userExists: true,
+          },
+        });
+      }
+      referral_id = referralCode.referral_id;
+    }
+
     const customer_id = uuidv4();
     const newCustomer = (await customerRepo.createCustomer(
       {
@@ -574,6 +600,7 @@ const register = async (req: Request, res: Response) => {
         is_2fa_enabled: false,
         last_login_at: new Date().toISOString(),
         last_login_ip: ip,
+        ...(referral_id && { referral_id }),
       },
       customer_id,
       { trx }

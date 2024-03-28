@@ -6,6 +6,7 @@ const newUserValidator = Joi.object({
   phone_number: validators.phone.required(),
   username: validators.username.required(),
   pin: validators.pin.required(),
+  referral_code: validators.referralCode.optional().allow(""),
   cnf_pin: Joi.ref("pin"),
 }).with("pin", "cnf_pin");
 
